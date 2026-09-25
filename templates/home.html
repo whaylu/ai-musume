@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# ===================== 看板 ===================== #}
+<section class="section" id="dashboard-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">主页看板 <span class="en-title">HOME DASHBOARD</span></h2>
+  </div>
+
+  <div id="dashboard-frame">
+    <div id="intro-frame">
+      <div class="intro-item"><p class="intro-text">今天是……我经营仝娘之家的第 {{ days }} 天。</p></div>
+      <div class="intro-item"><p class="intro-text">到目前为止，家里已经住了 {{ total }} 位仝娘。</p></div>
+      <div class="intro-item"><p class="intro-text">要先来认识一下仝娘们吗？或者看看最新的新闻？</p></div>
+      <div class="intro-item"><p class="intro-text">抑或是……看一场惊心动魄的八角笼决斗呢？</p></div>
+      <div class="intro-item"><p class="intro-text">随意逛逛吧！或许……会有意想不到的收获呢？</p></div>
+      <div class="intro-item"><p class="intro-text"><span class="verdict-label">提示：</span>若内容看不清楚，可以使用缩放。</p></div>
+    </div>
+
+    <div id="dashnews-frame">
+      <div id="news-slider" class="news-slider">
+        {% for n in news %}{% include "_news_card.html" %}{% endfor %}
+
+        <a class="news-card news-card-more" href="{{ url_for('news_gallery') }}">
+          <div class="news-more-body">
+            <div class="news-more-icon">📰</div>
+            <h3 class="news-title glow">查看全部 →</h3>
+            <p class="news-desc glow">点击进入新闻图鉴全集，浏览完整历史公告。</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ===================== 仝娘精选 ===================== #}
+<section class="section" id="character-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">仝娘精选 <span class="en-title">FEATURED ARCHIVES</span></h2>
+  </div>
+
+  <div class="character-grid">
+    {% for c in characters %}{% include "_character_card.html" %}{% endfor %}
+
+    <a class="card card-more" href="{{ url_for('gallery') }}">
+      <div class="card-more-icon">📚</div>
+      <div class="card-title">查看图鉴</div>
+      <div class="card-tag">ALL ARCHIVES</div>
+      <div class="card-more-sub">完整图鉴 ({{ total }}) →</div>
+    </a>
+  </div>
+</section>
+
+{# ===================== 大白话术语入口 ===================== #}
+<section class="section" id="translate-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">大白话术语 <span class="en-title">TERM TRANSLATION</span></h2>
+  </div>
+
+  <div class="translate-grid">
+    <a class="translate-card" href="{{ url_for('terms', level='entry') }}">
+      <img class="translate-card-img" src="{{ url_for('static', filename='imgs/ds002.png') }}" alt="入门" draggable="false">
+      <h3 class="translate-card-title">入门</h3>
+    </a>
+    <a class="translate-card" href="{{ url_for('terms', level='advanced') }}">
+      <img class="translate-card-img" src="{{ url_for('static', filename='imgs/ds004.png') }}" alt="进阶" draggable="false">
+      <h3 class="translate-card-title">进阶</h3>
+    </a>
+    <a class="translate-card" href="{{ url_for('terms', level='hardcore') }}">
+      <img class="translate-card-img" src="{{ url_for('static', filename='imgs/ds003.png') }}" alt="硬核" draggable="false">
+      <h3 class="translate-card-title">硬核</h3>
+    </a>
+    <a class="translate-card" href="{{ url_for('terms', level='meme') }}">
+      <img class="translate-card-img" src="{{ url_for('static', filename='imgs/ds005.png') }}" alt="梗" draggable="false">
+      <h3 class="translate-card-title">?!梗!?</h3>
+    </a>
+  </div>
+</section>
+
+{# ===================== 特别栏目 ===================== #}
+<section class="section" id="creations-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">特别栏目 <span class="en-title">SPECIAL SECTIONS</span></h2>
+  </div>
+
+  <div class="creations-grid-4">
+    <a class="simple-card" href="{{ url_for('section', key='octagon') }}"
+       style="--bg-img: url('{{ url_for('static', filename='imgs/battle.png') }}');">
+      <div class="card-content">
+        <h3 class="card-title glow">虚拟八角笼</h3>
+        <p class="card-subtitle glow">要知道，八角笼里什么都可能发生……</p>
+      </div>
+    </a>
+    <a class="simple-card" href="{{ url_for('section', key='prediction') }}"
+       style="--bg-img: url('{{ url_for('static', filename='imgs/yuyan.png') }}');">
+      <div class="card-content">
+        <h3 class="card-title glow">大模型预言</h3>
+        <p class="card-subtitle glow">2067年，仝娘将称霸世界？！</p>
+      </div>
+    </a>
+    <a class="simple-card" href="{{ url_for('section', key='moments') }}"
+       style="--bg-img: url('{{ url_for('static', filename='imgs/group003.png') }}');">
+      <div class="card-content">
+        <h3 class="card-title glow">仝娘朋友圈</h3>
+        <p class="card-subtitle glow">用户又在胡说八道了……</p>
+      </div>
+    </a>
+    <a class="simple-card" href="{{ url_for('section', key='catchphrase') }}"
+       style="--bg-img: url('{{ url_for('static', filename='imgs/group001.png') }}');">
+      <div class="card-content">
+        <h3 class="card-title glow">口头禅收录</h3>
+        <p class="card-subtitle glow">什么叫做……“AI味”？</p>
+      </div>
+    </a>
+  </div>
+</section>
+
+{# ===================== 站外推荐 ===================== #}
+<section class="section" id="external-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">其他内容 <span class="en-title">ELSEWHERE</span></h2>
+  </div>
+
+  <div class="external-grid">
+    {% for site in external_sites %}
+      <a class="external-card" href="{{ site.url }}" target="_blank" rel="noopener noreferrer">
+        <div class="external-card-top">
+          {% if site.img %}
+            <img class="external-logo" src="{{ site.img }}" alt="{{ site.name }}">
+          {% else %}
+            <span class="external-emoji">{{ site.icon }}</span>
+          {% endif %}
+        </div>
+        <div>
+          <h3 class="external-card-title">{{ site.name }}</h3>
+          <p class="external-card-tagline">{{ site.tagline }}</p>
+        </div>
+        <div class="external-card-foot">
+          <span class="external-host">{{ site.hostname }}</span>
+          <span class="external-arrow">↗</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}

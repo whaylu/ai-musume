@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">{{ code }}</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">{{ title }} <span class="en-title">{{ en_title }}</span></h2>
+  </div>
+
+  {% if characters %}
+    <div class="character-grid">
+      {% for c in characters %}{% include "_character_card.html" %}{% endfor %}
+    </div>
+  {% elif matched_news or matched_terms %}
+    {# 仝娘为空但搜到了新闻/术语，不显示空状态 #}
+  {% else %}
+    <div class="empty-hint" style="padding: 60px 0;">
+      🔍 未找到与 “<strong>{{ q }}</strong>” 相关的仝娘、术语或新闻。<br><br>
+      <span style="font-size: 13px; color: var(--text-muted);">提示：尝试搜索关键词如“开源”、“免费”、“代码”、“推理”、“DeepSeek”、“GPT”、“OpenAI” 等。</span>
+    </div>
+  {% endif %}
+
+  {% if matched_terms %}
+    <div class="search-section-divider">
+      <div class="section-title-wrapper" style="margin-top: 36px;">
+        <div class="title-decor"></div>
+        <h3 class="titles">匹配的术语词条 <span class="en-title">MATCHED TERMS ({{ matched_terms|length }})</span></h3>
+      </div>
+      <div class="term-card-list">
+        {% for term in matched_terms %}
+          <div class="term-card">
+            <div class="term-header"><h3 class="term-title">{{ term.name }}</h3></div>
+            <div class="term-body">
+              <div class="term-plain-box">
+                <p class="term-plain-text"><span class="verdict-label">大白话：</span>{{ term.plain }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if matched_news %}
+    <div class="search-section-divider">
+      <div class="section-title-wrapper" style="margin-top: 36px;">
+        <div class="title-decor"></div>
+        <h3 class="titles">匹配的新闻动态 <span class="en-title">MATCHED NEWS ({{ matched_news|length }})</span></h3>
+      </div>
+      <div class="news-grid">
+        {% for n in matched_news %}{% include "_news_card.html" %}{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

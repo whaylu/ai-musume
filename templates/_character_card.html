@@ -1,0 +1,7 @@
+<a class="card" href="{{ url_for('character_detail', char_id=c.id) }}">
+  <span class="card-code">#{{ c.code }}</span>
+  <img class="card-img" src="{{ url_for('static', filename=c.logo_url) }}"
+       alt="{{ c.name }}" draggable="false">
+  <div class="card-title">{{ c.name }}</div>
+  <div class="card-tag">{{ c.title }}</div>
+</a>

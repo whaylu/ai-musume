@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="detail-header">
+  <a class="back-btn" href="{{ url_for('gallery') }}">← 返回图鉴列表</a>
+  <span class="detail-code">ARCHIVE #{{ char.code }}</span>
+</div>
+
+<div class="detail-layout">
+  <aside class="detail-left-panel">
+    <div class="detail-polaroid">
+      <img class="detail-avatar" src="{{ url_for('static', filename=char.char_url) }}"
+           alt="{{ char.name }}" draggable="false">
+
+      <div class="left-header">
+        <h1 class="left-name">{{ char.name }}</h1>
+        <span class="left-title-badge">{{ char.title }}</span>
+      </div>
+
+      <div class="left-meta-list">
+        <div class="meta-item"><span class="meta-label">公司</span><span class="meta-val">{{ char.company }}</span></div>
+        <div class="meta-item"><span class="meta-label">国籍</span><span class="meta-val">{{ char.nationality }}</span></div>
+        <div class="meta-item"><span class="meta-label">生日</span><span class="meta-val">{{ char.birthday }}</span></div>
+      </div>
+
+      <div class="left-section">
+        <div class="tags-wrapper">
+          {% for t in char.main_tags %}<span class="tag-pill main-tag">{{ t }}</span>{% endfor %}
+        </div>
+      </div>
+
+      <div class="left-section">
+        <div class="tags-wrapper">
+          {% for t in char.modality_tags %}<span class="tag-pill modality-tag">{{ t }}</span>{% endfor %}
+        </div>
+      </div>
+
+      <div class="left-quote-box">
+        <p class="quote-text">“ {{ char.quote }} ”</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="detail-main-panel">
+    <section class="detail-box">
+      <h3 class="detail-box-title">设定与简介</h3>
+      <p class="detail-bio-paragraph">{{ char.bio }}</p>
+    </section>
+
+    <section class="detail-box">
+      <h3 class="detail-box-title">能力维度评估</h3>
+      <div class="detail-stats-grid">
+        {% for label, val in char.stats.items() %}
+          <div class="stat-item">
+            <div class="stat-info">
+              <span class="stat-label">{{ label }}</span>
+              <span class="stat-val">{{ val }}%</span>
+            </div>
+            <div class="stat-bar-bg">
+              <div class="stat-bar-fill" style="--stat-width: {{ val }}%; width: var(--stat-width);"></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="detail-box">
+      <h3 class="detail-box-title">模型版本与参数规格</h3>
+      <div class="version-table-wrapper">
+        <table class="version-table">
+          <thead>
+            <tr><th>模型版本</th><th>参数量</th><th>上下文窗口</th><th>收费模式 / 价格</th></tr>
+          </thead>
+          <tbody>
+            {% for v in char.versions %}
+              <tr>
+                <td class="v-name">{{ v.name }}</td>
+                <td>{{ v.params }}</td>
+                <td>{{ v.context }}</td>
+                <td><span class="v-price">{{ v.price }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+{% endblock %}

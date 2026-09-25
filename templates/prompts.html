@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">{{ active.code }}</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">提示词档案 · {{ active.title }} <span class="en-title">{{ active.code }}</span></h2>
+  </div>
+
+  <div class="gallery-tabs">
+    {% for s in scenes %}
+      <a class="gallery-tab {{ 'active' if s.key == active.key }}"
+         href="{{ url_for('prompts', key=s.key) }}">{{ s.title }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="term-card-list">
+    {% for p in active.prompts %}
+      <div class="term-card">
+        <div class="term-header"><h3 class="term-title">{{ p.name }}</h3></div>
+        <div class="term-body">
+          <p class="prompt-when">{{ p.when }}</p>
+          <div class="prompt-content-wrapper">
+            <button type="button" class="prompt-copy-btn">复制</button>
+            <pre class="prompt-content">{{ p.prompt }}</pre>
+          </div>
+          <div class="prompt-tips"><span class="prompt-tips-label">为什么这么写：</span>{{ p.tips }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

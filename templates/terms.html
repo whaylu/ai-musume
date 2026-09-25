@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">{{ meta.code }}</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">大白话术语 · {{ meta.label }} <span class="en-title">{{ meta.code }}</span></h2>
+  </div>
+
+  <div id="term-tabs" class="gallery-tabs">
+    {% for key, m in levels.items() %}
+      <a class="gallery-tab {{ 'active' if key == active }}"
+         href="{{ url_for('terms', level=key) }}">{{ m.label }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="term-card-list">
+    {% for term in terms %}
+      <div class="term-card">
+        <div class="term-header"><h3 class="term-title">{{ term.name }}</h3></div>
+        <div class="term-body">
+          <div class="term-plain-box">
+            <p class="term-plain-text"><span class="verdict-label">大白话：</span>{{ term.plain }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

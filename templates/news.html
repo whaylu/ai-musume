@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">NEWS ARCHIVES</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">新闻动态图鉴 <span class="en-title">NEWS & ANNOUNCEMENTS</span></h2>
+  </div>
+
+  <div class="news-grid">
+    {% for n in news %}{% include "_news_card.html" %}{% endfor %}
+  </div>
+</div>
+
+{% endblock %}

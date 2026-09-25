@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">{{ meta.code }}</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">{{ meta.title }} <span class="en-title">{{ meta.code }}</span></h2>
+  </div>
+
+  {% if battles %}
+    <div class="battle-card-list">
+      {% for b in battles %}
+        <div class="battle-card">
+          <div class="battle-header">
+            <span class="battle-num">#0{{ b.id }}</span>
+            <h3 class="battle-question">{{ b.question }}</h3>
+          </div>
+
+          <div class="battle-arena">
+            <div class="fighter-col {{ 'is-winner' if b.a_wins }}">
+              <div class="fighter-meta">
+                <img class="fighter-logo" src="{{ url_for('static', filename='imgs/' + b.fighter_a.id + 'logo.png') }}"
+                     onerror="this.style.display='none'">
+                <span class="fighter-name">{{ b.fighter_a.name }}</span>
+                {% if b.a_wins %}<span class="win-pill">WIN</span>{% endif %}
+              </div>
+              <p class="fighter-text">{{ b.fighter_a.response }}</p>
+            </div>
+
+            <div class="fighter-col {{ 'is-winner' if b.b_wins }}">
+              <div class="fighter-meta">
+                <img class="fighter-logo" src="{{ url_for('static', filename='imgs/' + b.fighter_b.id + 'logo.png') }}"
+                     onerror="this.style.display='none'">
+                <span class="fighter-name">{{ b.fighter_b.name }}</span>
+                {% if b.b_wins %}<span class="win-pill">WIN</span>{% endif %}
+              </div>
+              <p class="fighter-text">{{ b.fighter_b.response }}</p>
+            </div>
+          </div>
+
+          <div class="battle-verdict">
+            <span class="verdict-label">裁决：</span>
+            <span>{{ b.commentary }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-hint" style="padding: 60px 0; font-size: 16px;">
+      🚧 【{{ meta.title }}】栏目正在筹备更新中，敬请期待！
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

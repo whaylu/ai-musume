@@ -1,0 +1,18 @@
+{% if n.url %}
+<a class="news-card" href="{{ n.url }}" target="_blank" rel="noopener noreferrer">
+{% else %}
+<div class="news-card">
+{% endif %}
+  <div class="news-cover">
+    {% if n.img.startswith('http') %}
+      <img src="{{ n.img }}" alt="{{ n.title }}" draggable="false">
+    {% else %}
+      <img src="{{ url_for('static', filename=n.img) }}" alt="{{ n.title }}" draggable="false">
+    {% endif %}
+  </div>
+  <div class="news-body">
+    <div class="news-header"><span class="news-date">{{ n.date }}</span></div>
+    <h3 class="news-title">{{ n.title }}</h3>
+    <p class="news-desc">{{ n.desc }}</p>
+  </div>
+{% if n.url %}</a>{% else %}</div>{% endif %}

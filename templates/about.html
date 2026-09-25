@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">ABOUT</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">关于本站 <span class="en-title">ABOUT THIS SITE</span></h2>
+  </div>
+
+  <div class="about-card">
+    {% for item in items %}
+      <div class="about-item">
+        <span class="about-item-label">{{ item.label }}</span>
+        <p class="about-item-value">{{ item.value }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
