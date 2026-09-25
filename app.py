@@ -138,6 +138,8 @@ def create_app() -> Flask:
 
     return app
 
+# 供 Gunicorn 在服务器上直接调用
+app = create_app()
 
 if __name__ == "__main__":
-    create_app().run(debug=True)
+    app.run(debug=True)
