@@ -12,50 +12,164 @@
     <h2 class="titles">{{ title }} <span class="en-title">{{ en_title }}</span></h2>
   </div>
 
-  {% if characters %}
-    <div class="character-grid">
-      {% for c in characters %}{% include "_character_card.html" %}{% endfor %}
-    </div>
-  {% elif matched_news or matched_terms %}
-    {# 仝娘为空但搜到了新闻/术语，不显示空状态 #}
-  {% else %}
-    <div class="empty-hint" style="padding: 60px 0;">
-      🔍 未找到与 “<strong>{{ q }}</strong>” 相关的仝娘、术语或新闻。<br><br>
-      <span style="font-size: 13px; color: var(--text-muted);">提示：尝试搜索关键词如“开源”、“免费”、“代码”、“推理”、“DeepSeek”、“GPT”、“OpenAI” 等。</span>
-    </div>
-  {% endif %}
+  {# ============ 搜索模式 ============ #}
+  {% if search_result %}
 
-  {% if matched_terms %}
-    <div class="search-section-divider">
-      <div class="section-title-wrapper" style="margin-top: 36px;">
-        <div class="title-decor"></div>
-        <h3 class="titles">匹配的术语词条 <span class="en-title">MATCHED TERMS ({{ matched_terms|length }})</span></h3>
+    {# 统计条 #}
+    <div class="search-stats">
+      {% if search_result.is_empty %}
+        没有找到与 “<b>{{ q }}</b>” 相关的内容。
+      {% else %}
+        共 <b>{{ search_result.total }}</b> 条结果，
+        用时 <b>{{ "%.1f"|format(search_result.elapsed_ms) }} ms</b>。
+      {% endif %}
+      <span class="search-tip">
+        提示：关键词前加 <code>-</code> 可排除，如 <code>开源 -国产</code>
+      </span>
+    </div>
+
+    {# 搜索历史 #}
+    {% if history %}
+      <div class="search-history">
+        <span class="history-label">最近搜索：</span>
+        {% for h in history %}
+          <a class="history-chip" href="{{ url_for('search', q=h) }}">{{ h }}</a>
+        {% endfor %}
+        <form method="post" action="{{ url_for('clear_history') }}" style="display:inline;">
+          <button type="submit" class="history-clear">清空</button>
+        </form>
       </div>
-      <div class="term-card-list">
-        {% for term in matched_terms %}
-          <div class="term-card">
-            <div class="term-header"><h3 class="term-title">{{ term.name }}</h3></div>
-            <div class="term-body">
-              <div class="term-plain-box">
-                <p class="term-plain-text"><span class="verdict-label">大白话：</span>{{ term.plain }}</p>
+    {% endif %}
+
+    {# 空结果提示 #}
+    {% if search_result.is_empty %}
+      <div class="empty-hint" style="padding: 60px 0;">
+        🔍 换个词试试？比如 “开源”、“GPT”、“RAG”、“长文本”。
+      </div>
+    {% endif %}
+
+    {# 分组渲染 #}
+    {% set grouped = search_result.grouped %}
+
+    {# ---- 角色组 ---- #}
+    {% if grouped.get("characters") %}
+      <div class="search-group">
+        <h3 class="search-group-title">
+          仝娘 <span class="search-group-count">{{ grouped["characters"]|length }}</span>
+        </h3>
+        <div class="character-grid">
+          {% for hit in grouped["characters"] %}
+            {% set c = hit.item %}
+            <a class="card" href="{{ url_for('character_detail', char_id=c.id) }}">
+              <span class="card-code">#{{ c.code }}</span>
+              <span class="card-score">{{ hit.score }}分</span>
+              <img class="card-img" src="{{ url_for('static', filename=c.logo_url) }}"
+                   alt="{{ c.name }}" draggable="false" loading="lazy">
+              <div class="card-title">{{ c.name|safe }}</div>
+              <div class="card-tag">{{ c.title }}</div>
+              {% if hit.matched_fields %}
+                <div class="card-match">命中：{{ hit.matched_fields|join(" · ") }}</div>
+              {% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# ---- 新闻组 ---- #}
+    {% if grouped.get("news") %}
+      <div class="search-group">
+        <h3 class="search-group-title">
+          新闻 <span class="search-group-count">{{ grouped["news"]|length }}</span>
+        </h3>
+        <div class="news-grid">
+          {% for hit in grouped["news"] %}
+            {% set n = hit.item %}
+            {% if n.url %}<a class="news-card" href="{{ n.url }}" target="_blank" rel="noopener noreferrer">
+            {% else %}<div class="news-card">{% endif %}
+              <div class="news-cover">
+                {% if n.img.startswith('http') %}
+                  <img src="{{ n.img }}" alt="{{ n.title }}" draggable="false" loading="lazy">
+                {% else %}
+                  <img src="{{ url_for('static', filename=n.img) }}" alt="{{ n.title }}" draggable="false" loading="lazy">
+                {% endif %}
+              </div>
+              <div class="news-body">
+                <div class="news-header">
+                  <span class="news-date">{{ n.date }}</span>
+                  <span class="card-score">{{ hit.score }}分</span>
+                </div>
+                <h3 class="news-title">{{ n.title }}</h3>
+                <p class="news-desc">{{ n.desc }}</p>
+                {% if hit.matched_fields %}
+                  <div class="card-match">命中：{{ hit.matched_fields|join(" · ") }}</div>
+                {% endif %}
+              </div>
+            {% if n.url %}</a>{% else %}</div>{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# ---- 术语组 ---- #}
+    {% if grouped.get("terms") %}
+      <div class="search-group">
+        <h3 class="search-group-title">
+          术语 <span class="search-group-count">{{ grouped["terms"]|length }}</span>
+        </h3>
+        <div class="term-card-list">
+          {% for hit in grouped["terms"] %}
+            {% set term = hit.item %}
+            <div class="term-card">
+              <div class="term-header">
+                <h3 class="term-title">{{ term.name }}</h3>
+                <span class="card-score">{{ hit.score }}分</span>
+              </div>
+              <div class="term-body">
+                <div class="term-plain-box">
+                  <p class="term-plain-text">
+                    <span class="verdict-label">大白话：</span>{{ term.plain }}
+                  </p>
+                </div>
+                {% if hit.matched_fields %}
+                  <div class="card-match">命中：{{ hit.matched_fields|join(" · ") }}</div>
+                {% endif %}
               </div>
             </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
 
-  {% if matched_news %}
-    <div class="search-section-divider">
-      <div class="section-title-wrapper" style="margin-top: 36px;">
-        <div class="title-decor"></div>
-        <h3 class="titles">匹配的新闻动态 <span class="en-title">MATCHED NEWS ({{ matched_news|length }})</span></h3>
+    {# ---- 分页 ---- #}
+    {% if search_result.total > search_result.per_page %}
+      {% set total_pages = (search_result.total // search_result.per_page) + (1 if search_result.total % search_result.per_page else 0) %}
+      <nav class="pagination">
+        {% if search_result.page > 1 %}
+          <a class="page-btn" href="{{ url_for('search', q=q, page=search_result.page - 1) }}">← 上一页</a>
+        {% else %}
+          <span class="page-btn disabled">← 上一页</span>
+        {% endif %}
+
+        <span class="page-info">第 {{ search_result.page }} / {{ total_pages }} 页</span>
+
+        {% if search_result.page < total_pages %}
+          <a class="page-btn" href="{{ url_for('search', q=q, page=search_result.page + 1) }}">下一页 →</a>
+        {% else %}
+          <span class="page-btn disabled">下一页 →</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  {# ============ 图鉴模式 ============ #}
+  {% else %}
+
+    {% if characters %}
+      <div class="character-grid">
+        {% for c in characters %}{% include "_character_card.html" %}{% endfor %}
       </div>
-      <div class="news-grid">
-        {% for n in matched_news %}{% include "_news_card.html" %}{% endfor %}
-      </div>
-    </div>
+    {% endif %}
+
   {% endif %}
 
 </div>

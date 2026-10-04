@@ -1,11 +1,12 @@
 """仝娘之家 · Flask 入口（很薄，只做转接）"""
 from datetime import date
 
-from flask import Flask, render_template, abort, request
+from flask import Flask, render_template, abort, request, jsonify
 
 from core import (
     CharacterService, NewsService, TermService, PromptService,
-    BattleService, SearchService,
+    BattleService, SearchService, Suggester, SynonymMap, SearchHistory,
+    SearchSource,
     NotFound,
 )
 from data import (
@@ -14,18 +15,43 @@ from data import (
 )
 
 START_DATE = date(2026, 9, 8)
+PER_PAGE = 12
+
+
+SYNONYMS = SynonymMap({
+    "ds":       ["deepseek", "深度求索"],
+    "gpt":      ["chatgpt", "openai"],
+    "ai":       ["人工智能"],
+    "llm":      ["大语言模型", "大模型"],
+    "rag":      ["检索增强生成"],
+    "开源":     ["open source", "open-source"],
+    "闭源":     ["closed source"],
+    "长文本":   ["长上下文", "长文"],
+})
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
+    app.secret_key = "ai-musume-dev-key"   # 只为演示 session
 
-    # 依赖组装（一个地方集中 new，方便以后换实现）
     char_service = CharacterService(CHARACTERS)
     news_service = NewsService(NEWS)
     term_service = TermService(TERMS, TERM_META)
     prompt_service = PromptService(PROMPT_SCENES)
     battle_service = BattleService(BATTLES)
-    search_service = SearchService(char_service, news_service, term_service)
+
+    search_service = SearchService.from_services(
+        char_service, news_service, term_service, synonyms=SYNONYMS,
+    )
+
+    suggester = Suggester([
+        SearchSource("characters", char_service.all()),
+        SearchSource("news", news_service.all()),
+        SearchSource("terms", term_service.all_terms()),
+    ])
+
+    # 全局搜索历史（内存版，重启即清）
+    history = SearchHistory(max_items=10)
 
     # ---------- 首页 ----------
     @app.route("/")
@@ -41,9 +67,10 @@ def create_app() -> Flask:
             term_meta=term_service.levels(),
             sections=[SECTIONS[k] for k in ("octagon", "prediction", "moments", "catchphrase")],
             external_sites=EXTERNAL_SITES,
+            history=history.all(),
         )
 
-    # ---------- 图鉴 / 搜索 ----------
+    # ---------- 图鉴 ----------
     @app.route("/gallery")
     def gallery():
         return render_template(
@@ -54,28 +81,71 @@ def create_app() -> Flask:
             title="仝娘图鉴全集",
             en_title="CHARACTER ARCHIVES",
             code="ALL ARCHIVES",
-            extra_html=None,
+            search_result=None,
+            history=history.all(),
         )
 
+    # ---------- 搜索 ----------
     @app.route("/search")
     def search():
         q = request.args.get("q", "").strip()
+        page = request.args.get("page", 1, type=int)
+
         if not q:
             return gallery()
-        result = search_service.search(q)
+
+        history.push(q)
+
+        result = search_service.search_full(q, page=page, per_page=PER_PAGE)
+
         return render_template(
             "gallery.html",
             nav=None,
-            characters=result["characters"],
+            characters=[],
             q=q,
             title=f"搜索结果：{q}",
             en_title="SEARCH RESULTS",
             code="SEARCH RESULTS",
-            extra_html=None,
-            matched_news=result["news"],
-            matched_terms=result["terms"],
+            search_result=result,
+            history=history.all(),
         )
 
+    @app.route("/search/history/clear", methods=["POST"])
+    def clear_history():
+        history.clear()
+        return jsonify({"ok": True})
+
+    # ---------- 自动补全 API ----------
+    @app.route("/api/suggest")
+    def api_suggest():
+        q = request.args.get("q", "").strip()
+        return jsonify(suggester.suggest(q, limit=8))
+
+    # ---------- 搜索结果详情 API ----------
+    @app.route("/api/search")
+    def api_search():
+        q = request.args.get("q", "").strip()
+        if not q:
+            return jsonify({"total": 0, "elapsed_ms": 0, "groups": {}})
+        result = search_service.search_full(q)
+        return jsonify({
+            "total": result.total,
+            "elapsed_ms": round(result.elapsed_ms, 2),
+            "groups": {
+                name: [
+                    {
+                        "name": h.display_name,
+                        "score": h.score,
+                        "matched_fields": h.matched_fields,
+                        "matched_keywords": h.matched_keywords,
+                    }
+                    for h in hits
+                ]
+                for name, hits in result.grouped.items()
+            },
+        })
+
+    # ---------- 角色详情 ----------
     @app.route("/character/<char_id>")
     def character_detail(char_id):
         try:
@@ -118,9 +188,7 @@ def create_app() -> Flask:
         scene = prompt_service.get(key)
         if not scene:
             abort(404)
-        return render_template(
-            "prompts.html", nav=None, scenes=scenes, active=scene,
-        )
+        return render_template("prompts.html", nav=None, scenes=scenes, active=scene)
 
     # ---------- 特别栏目 ----------
     @app.route("/section/<key>")
@@ -138,7 +206,7 @@ def create_app() -> Flask:
 
     return app
 
-# 供 Gunicorn 在服务器上直接调用
+
 app = create_app()
 
 if __name__ == "__main__":

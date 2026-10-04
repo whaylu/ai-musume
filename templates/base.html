@@ -12,8 +12,8 @@
 <body>
   <div class="bg-wrapper">
     <img id="bgimg"
-        src="{{ url_for('static', filename='imgs/group002.png') }}"
-        alt="Background Image">
+         src="{{ url_for('static', filename='imgs/group002.png') }}"
+         alt="Background Image">
     <div class="bg-overlay"></div>
   </div>
 
@@ -23,10 +23,12 @@
       <span class="logo-sub">AI-MUSUME</span>
     </a>
 
-    <form class="search-box" action="{{ url_for('search') }}" method="get" role="search">
+    <form class="search-box" action="{{ url_for('search') }}" method="get" role="search"
+          data-suggest-url="{{ url_for('api_suggest') }}">
       <input id="searchinp" name="q" type="text"
              placeholder="搜索仝娘 / 设定 / 关键字……"
              value="{{ q or '' }}" autocomplete="off">
+      <div id="suggest-list" class="suggest-list" hidden></div>
     </form>
 
     <nav class="nav">
@@ -43,7 +45,7 @@
     </div>
 
     <footer class="footer">
-      <p>© 2026 仝娘之家 The Home of AI-musume | version 0.3 | Powered by Python</p>
+      <p>© 2026 仝娘之家 The Home of AI-musume | version 0.5 | Powered by Python</p>
     </footer>
   </main>
 

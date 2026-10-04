@@ -579,7 +579,7 @@ ABOUT_ITEMS: list[AboutItem] = [
     AboutItem("技术栈", "Python (Flask + Jinja2) + 原生 HTML / CSS / JavaScript；字体 Noto Sans SC。"),
     AboutItem("站长", "Whale（溦潞）"),
     AboutItem("说明", "站内所有 AI 模型名称、Logo 与商标归各自公司所有；本站仅作学习与演示用途，不构成任何商业推荐。"),
-    AboutItem("版本", "v0.3"),
+    AboutItem("版本", "v0.6"),
 ]
 
 

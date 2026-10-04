@@ -1493,3 +1493,224 @@ body::-webkit-scrollbar {
     grid-template-columns: 1fr;
   }
 }
+
+/* ================= 搜索 v2 ================= */
+
+/* 高亮 */
+mark {
+  background: linear-gradient(180deg, transparent 55%, #f9c62b 55%);
+  color: inherit;
+  font-weight: 700;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* 统计条 */
+.search-stats {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  margin-bottom: 12px;
+}
+.search-stats b {
+  color: var(--accent-warm);
+  font-weight: 800;
+}
+
+/* 搜索历史 */
+.search-history {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--warmer-border);
+}
+.history-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.history-chip {
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  background: #faf6f0;
+  border: 1px solid var(--warm-border);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-sub);
+  transition: all 0.2s ease;
+}
+.history-chip:hover {
+  color: var(--accent-warm);
+  border-color: var(--accent-warm);
+  background: var(--accent-soft);
+}
+.history-clear {
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+.history-clear:hover { color: #d94b3c; }
+
+/* 搜索分组 */
+.search-group { margin-top: 28px; }
+.search-group:first-of-type { margin-top: 8px; }
+.search-group-title {
+  font-size: var(--font-md);
+  font-weight: 800;
+  color: var(--text-main);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  border-bottom: 1px dashed var(--warmer-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-group-count {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--accent-warm);
+  background: var(--accent-soft);
+  padding: 1px 8px;
+  border-radius: 6px;
+}
+
+/* 卡片上的分数和命中提示 */
+.card-score {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-warm);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.card-match {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--warmer-border);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+.news-card .card-score { position: static; margin-left: auto; }
+.news-header { display: flex; align-items: center; gap: 8px; }
+.term-card .card-score { margin-left: auto; }
+.term-card .term-header {
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--warmer-border);
+}
+.page-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+.page-btn:hover:not(.disabled) {
+  color: var(--accent-warm);
+  border-color: var(--accent-warm);
+  background: var(--accent-soft);
+}
+.page-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.page-info {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+/* 自动补全下拉 */
+.search-box {
+  position: relative;
+}
+.suggest-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hover);
+  padding: 6px;
+  z-index: 2000;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.suggest-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: var(--font-sm);
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.suggest-item:hover,
+.suggest-item.active {
+  background: var(--accent-soft);
+  color: var(--accent-warm);
+}
+
+/* ================= 搜索 v2 修复 ================= */
+
+/* 术语卡片：让分数和标题同一行显示，分数不再脱离卡片 */
+.term-card .term-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.term-card .card-score {
+  position: static;
+  flex-shrink: 0;
+}
+
+/* 新闻卡片：分数不脱离 */
+.news-card .card-score {
+  position: static;
+  margin-left: auto;
+}
+
+/* 搜索框下方的用法提示 */
+.search-tip {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+.search-tip code {
+  background: #faf6f0;
+  border: 0.5px solid var(--warm-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: #c94916;
+  font-size: 10px;
+}
