@@ -1,7 +1,7 @@
 """仝娘之家 · Flask 入口（很薄，只做转接）"""
 from datetime import date
 
-from flask import Flask, render_template, abort, request, jsonify
+from flask import Flask, render_template, abort, request, jsonify, redirect, url_for
 
 from core import (
     CharacterService, NewsService, TermService, PromptService,
@@ -113,7 +113,8 @@ def create_app() -> Flask:
     @app.route("/search/history/clear", methods=["POST"])
     def clear_history():
         history.clear()
-        return jsonify({"ok": True})
+        # 从哪来，回哪去
+        return redirect(request.referrer or url_for("home"))
 
     # ---------- 自动补全 API ----------
     @app.route("/api/suggest")
