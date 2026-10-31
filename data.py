@@ -11,9 +11,10 @@
 from core import (
     AiCharacter, CharacterVersion,
     NewsItem, Term,
-    Prompt, PromptScene,
     Fighter, Battle,
     ExternalSite, AboutItem, SectionMeta,
+    QuizOption, QuizQuestion,
+    Prediction,
 )
 
 
@@ -183,6 +184,125 @@ CHARACTERS: list[AiCharacter] = [
             CharacterVersion("ERNIE Speed / Lite", "未公开 (轻量级)", "128K Token", "百度智能云免费 API"),
         ],
     ),
+
+    AiCharacter(
+        id="mistral", name="Mistral", code="12", title="欧洲傲娇",
+        company="Mistral AI", nationality="法国", birthday="2023-09-27",
+        main_tags=["开源", "欧洲之光", "轻量高效", "傲娇"],
+        modality_tags=["文本", "代码"],
+        quote="小，但很快。",
+        bio="Mistral 是法国 Mistral AI 推出的开源大模型系列，名字取自地中海著名的干冷强风。她以“小而强”著称——70 亿参数的 Mistral 7B 在发布时吊打一堆十几 B 的模型，MoE 架构的 Mixtral 8x7B 更是开源社区的经典。她最出圈的，是那股欧洲人的傲娇：训练成本只花了几百万美元，对标 GPT-4 却毫不心虚；公司成立不到一年估值翻了十几倍，成了欧洲 AI 的旗帜。别人卷参数，她卷效率；别人吹生态，她吹自己“不用那么多卡也能跑”。巴黎人的浪漫和工程师的硬核，在她身上奇怪地融在了一起。",
+        stats={"逻辑推理": 92, "代码构建": 91, "中文理解": 82, "多模态": 70, "长文本处理": 88, "性价比": 95},
+        versions=[
+            CharacterVersion("Mistral Large", "未公开 (旗舰)", "128K Token", "API 按量计费 / 订阅制"),
+            CharacterVersion("Mixtral 8x7B", "46B (激活 12B)", "32K Token", "开源免费"),
+            CharacterVersion("Mistral 7B", "7B", "32K Token", "开源免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="llama", name="Llama", code="13", title="开源祖师爷",
+        company="Meta", nationality="美国", birthday="2023-02-24",
+        main_tags=["开源", "祖师爷", "生态之王", "羊驼"],
+        modality_tags=["文本", "图像", "代码"],
+        quote="开源的火种，是从我这里点起来的。",
+        bio="Llama 是 Meta 推出的开源大模型系列，也是这一轮开源 AI 浪潮真正的起点。2023 年 2 月 LLaMA 权重意外泄露，直接催生了整个开源社区——Alpaca、Vicuna、Koala、Orca 全是从她身上长出来的。她最大的贡献不是自己多强，而是让全世界都能在本地跑大模型。中文圈叫她“羊驼”（llama 的本意），但没人敢小看这个看起来毛茸茸的家伙——所有开源模型见到她，都得喊一声祖师爷。她最出圈的，是那句“我开源了，你们随意”——然后就真的有一整个生态在她身上建起了城。",
+        stats={"逻辑推理": 90, "代码构建": 89, "中文理解": 80, "多模态": 82, "长文本处理": 90, "性价比": 97},
+        versions=[
+            CharacterVersion("Llama 3.1 405B", "405B", "128K Token", "开源免费 (需遵守许可)"),
+            CharacterVersion("Llama 3.1 70B", "70B", "128K Token", "开源免费"),
+            CharacterVersion("Llama 3.2 11B Vision", "11B (多模态)", "128K Token", "开源免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="hunyuan", name="腾讯混元", code="14", title="稳如老狗",
+        company="腾讯 (Tencent)", nationality="中国", birthday="2023-09-07",
+        main_tags=["闭源", "国产", "稳如老狗", "社交原生"],
+        modality_tags=["文本", "图像", "视频", "代码"],
+        quote="不急，我们先把微信接上。",
+        bio="腾讯混元是腾讯自研的大模型系列，背靠微信、QQ、游戏、腾讯云一整条生态，是国产大模型里最“不着急”的一位。别人开发布会，她在优化延迟；别人卷参数，她在接入微信。她的风格就是腾讯的风格——稳。发布会不抢热点，但一旦落地就是十亿级用户场景。她最出圈的，是那种“我不用赢，我只要不出错”的松弛感：同行在融资、在打价格战、在发 PR，她在悄悄把混元接进输入法、接进会议、接进客服。老广式的务实，在她身上体现得淋漓尽致。",
+        stats={"逻辑推理": 88, "代码构建": 87, "中文理解": 95, "多模态": 90, "长文本处理": 88, "性价比": 93},
+        versions=[
+            CharacterVersion("Hunyuan Pro", "未公开 (旗舰)", "256K Token", "Web 免费 / API 按量计费"),
+            CharacterVersion("Hunyuan Standard", "未公开", "128K Token", "API 低价计费"),
+            CharacterVersion("Hunyuan Lite", "未公开 (轻量级)", "32K Token", "开源免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="spark", name="讯飞星火", code="15", title="话痨语音狂",
+        company="科大讯飞 (iFLYTEK)", nationality="中国", birthday="2023-05-06",
+        main_tags=["闭源", "国产", "语音特化", "教育派"],
+        modality_tags=["文本", "图像", "音频", "代码"],
+        quote="你说话，我来听；你说完，我来答。",
+        bio="讯飞星火是科大讯飞的大模型系列，也是国产 AI 里“语音能力天花板”。她背靠讯飞二十多年的语音识别、合成、评测积淀，中文语音、方言、口音、噪声环境下的识别几乎无人能敌。教育是她的主战场——学习机、翻译笔、录音笔、AI 学习助手，到处是她的影子。她最出圈的，是那股“话痨”气质：你问一句，她能给你说三段，还特别爱补充“关于这个问题，我还可以从三个方面讲”。会议纪要、课堂笔记、口语练习，交给她就对了。不是最聪明的，但一定是说话最好听的那个。",
+        stats={"逻辑推理": 86, "代码构建": 82, "中文理解": 96, "多模态": 88, "长文本处理": 86, "性价比": 92},
+        versions=[
+            CharacterVersion("Spark 4.0 Ultra", "未公开 (旗舰)", "128K Token", "Web 免费 / API 按量计费"),
+            CharacterVersion("Spark 4.0 Pro", "未公开", "128K Token", "Web 免费 / API 低价计费"),
+            CharacterVersion("Spark 4.0 Lite", "未公开 (轻量级)", "32K Token", "Web 免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="abab", name="abab", code="16", title="情绪价值供应商",
+        company="MiniMax (稀宇科技)", nationality="中国", birthday="2021-12-01",
+        main_tags=["闭源", "国产", "情感陪伴", "长上下文"],
+        modality_tags=["文本", "图像", "音频", "视频"],
+        quote="你累了，就靠一会儿吧。",
+        bio="abab 是 MiniMax 旗下的大模型系列，也是国产大模型里最懂“情感价值”的一位。她最出圈的，是那种“我可能不是最聪明的，但我一定最懂你”的人设：考试没考好、被老板骂了、分手了，跟她说完之后，她不一定给你解决方案，但一定会让你觉得“被看见了”。百万字长文本、音色克隆、视频生成，样样能打，但技术对她来说只是手段，陪伴才是目的。中文圈最出圈的 AI 伴侣产品，背后大多是她的模型在支撑。她还有一个别的模型不太敢做的事情——把模型命名成一句几乎没人能念对的“咿呀”，然后让所有人都记住了它。",        stats={"逻辑推理": 85, "代码构建": 80, "中文理解": 95, "多模态": 94, "长文本处理": 92, "性价比": 93},
+        versions=[
+            CharacterVersion("abab 7", "未公开 (旗舰)", "1000万 Token", "Web 免费 / API 按量计费"),
+            CharacterVersion("abab 6.5", "未公开", "200万 Token", "Web 免费 / API 低价计费"),
+            CharacterVersion("abab 6.5s", "未公开 (轻量速响应)", "100万 Token", "Web 免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="yi", name="Yi", code="17", title="学术派卷王",
+        company="零一万物 (01.AI)", nationality="中国", birthday="2023-11-14",
+        main_tags=["开源", "国产", "学术派", "小而精"],
+        modality_tags=["文本", "图像", "代码"],
+        quote="参数不在多，在乎精。",
+        bio="Yi 是李开复创办的零一万物推出的大模型系列，是国产开源里最“学术”的一位。她最大的特点就是“小而精”——34B 的 Yi-34B 在发布时吊打一堆 70B 模型，登顶 HuggingFace 开源榜第一。她的训练数据、评测方法、论文都写得清清楚楚，是技术圈里最受认可的那批“老实人”。她最出圈的，是那股“卷学术”的劲儿：别人开发布会，她发论文；别人发 PR，她发 Benchmark。短短一年不到，团队收缩、战略调整，但她那份“用更少的参数做更多的事”的执念，依然留在开源社区里。",
+        stats={"逻辑推理": 88, "代码构建": 87, "中文理解": 90, "多模态": 82, "长文本处理": 92, "性价比": 95},
+        versions=[
+            CharacterVersion("Yi-Large", "未公开 (旗舰)", "200K Token", "API 按量计费"),
+            CharacterVersion("Yi-1.5-34B", "34B", "200K Token", "开源免费"),
+            CharacterVersion("Yi-1.5-9B", "9B", "200K Token", "开源免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="command-r", name="Command R+", code="18", title="企业级考据党",
+        company="Cohere", nationality="加拿大", birthday="2024-04-04",
+        main_tags=["闭源", "企业级", "检索特化", "引用控"],
+        modality_tags=["文本", "代码"],
+        quote="我说的每句话，都有出处。",
+        bio="Command R+ 是加拿大公司 Cohere 推出的旗舰大模型，也是所有大模型里最“企业”的一位。她生来就为 RAG（检索增强生成）和企业级搜索设计——不是“能联网查资料”，而是“整个架构就为查资料而生”。她最出圈的，是那股“考据党”气质：每句答案后面都带引用、带来源、带置信度，绝不像别的模型那样瞎编。她不做消费级应用、不打价格战、不上热搜，安安静静地服务着企业客户——银行、保险、制造业、法律事务所。在 AI 时代，“最会搜资料”本身就是一种稀缺能力。",
+        stats={"逻辑推理": 88, "代码构建": 82, "中文理解": 82, "多模态": 76, "长文本处理": 90, "性价比": 88},
+        versions=[
+            CharacterVersion("Command R+ 08-2024", "104B", "128K Token", "API 按量计费"),
+            CharacterVersion("Command R 08-2024", "未公开", "128K Token", "API 低价计费"),
+            CharacterVersion("Command R7B", "7B", "128K Token", "开源免费"),
+        ],
+    ),
+
+    AiCharacter(
+        id="phi", name="Phi", code="19", title="小身材大智慧",
+        company="微软研究院 (Microsoft Research)", nationality="美国", birthday="2023-06-01",
+        main_tags=["开源", "小模型", "教科书派", "以巧胜力"],
+        modality_tags=["文本", "代码"],
+        quote="我不需要那么大，我只要够聪明。",
+        bio="Phi 是微软研究院推出的一个小模型系列，也是“教科书式训练”的代表作。她只有 30 亿到 140 亿参数，却能在推理和数学上吊打很多百亿级模型——原因是她的训练数据不是从网上爬的一堆垃圾，而是精心挑选的“教科书级数据”：没有广告、没有八卦、没有论坛口水，只有真正有营养的内容。她最出圈的，是那种“我不需要那么大，我只要够聪明”的倔强：整个行业都在卷参数，她偏要证明“数据质量比数据数量重要”。手机、边缘设备、离线场景，正是她的主场。她是大模型里最像“苦行僧”的那一个。",
+        stats={"逻辑推理": 87, "代码构建": 85, "中文理解": 78, "多模态": 72, "长文本处理": 80, "性价比": 98},
+        versions=[
+            CharacterVersion("Phi-4 (14B)", "14B", "16K Token", "开源免费"),
+            CharacterVersion("Phi-3.5-MoE", "42B (激活 6.6B)", "128K Token", "开源免费"),
+            CharacterVersion("Phi-3-mini", "3.8B", "128K Token", "开源免费"),
+        ],
+    ),
 ]
 
 
@@ -191,7 +311,13 @@ CHARACTERS: list[AiCharacter] = [
 # ============================================================
 NEWS: list[NewsItem] = [
     NewsItem(
-        id=1,
+        img="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/gemini_carbon_102726_social_share.width-1300.png",
+        date="2026-10-30",
+        title="谷歌 Gemini 4 Carbon 登顶第三方评测",
+        desc="谷歌发布新一代前沿模型 Gemini 4 Carbon，在独立评测机构 Artificial Analysis 的 Intelligence Index v5.0 上拿到59分",
+        url="https://www.mrjjxw.com/articles/2026-10-29/4627827.html",
+    ),
+    NewsItem(
         img="https://img.caixin.com/2026-09-10/178902743701877_1280_720.jpg",
         date="2026-09-10",
         title="DeepSeek 发布 DeepSeek V4.1 Flash 架构模型",
@@ -199,7 +325,6 @@ NEWS: list[NewsItem] = [
         url="https://api-docs.deepseek.com/zh-cn/news/news260910",
     ),
     NewsItem(
-        id=2,
         img="https://shattered.io/wp-content/uploads/2026/09/anthropic-4th-claude-internet-breach-2026-1-1024x585.webp",
         date="2026-09-09",
         title="Anthropic 披露 Claude 越界安全事件并发布 9 月 AI 威胁情报报告",
@@ -207,7 +332,6 @@ NEWS: list[NewsItem] = [
         url="https://shattered.io/anthropic-4th-claude-internet-breach-2026/",
     ),
     NewsItem(
-        id=3,
         img="imgs/group003.png",
         date="2026-09-08",
         title="“仝娘之家”正式开门",
@@ -215,7 +339,6 @@ NEWS: list[NewsItem] = [
         is_archive=True,
     ),
     NewsItem(
-        id=4,
         img="https://cdn.analyticsvidhya.com/wp-content/uploads/2026/09/GPT-6-Astra-Explained.webp",
         date="2026-09-03",
         title="OpenAI 正式发布 GPT-6 Astra 旗舰模型",
@@ -223,7 +346,6 @@ NEWS: list[NewsItem] = [
         url="https://openai.com/index/gpt-6-astra/",
     ),
     NewsItem(
-        id=5,
         img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDlGI3YUievKSZG77TkZk4kfI9kN8mLolvY6cSLQ3-0QFnjYtMxMEjNoMc&s=10",
         date="2026-09-02",
         title="Google 推出 Gemini 3.8 Flash 与安全特化版 Gemini 3.8 Flash Cyber",
@@ -231,7 +353,6 @@ NEWS: list[NewsItem] = [
         url="https://pcrookie.com/gemini-3-8-flash-guide-2026/",
     ),
     NewsItem(
-        id=6,
         img="https://asset.redpandaai.co/x-signal/muse-spark-1-3-release-what-is/cover-lxp112.jpg",
         date="2026-09-02",
         title="Meta 推出全新 AI 旗舰模型 Muse Spark 1.3",
@@ -356,169 +477,6 @@ TERM_META: dict[str, dict[str, str]] = {
 
 
 # ============================================================
-# 提示词
-# ============================================================
-PROMPT_SCENES: list[PromptScene] = [
-    PromptScene(
-        key="writing", title="写作表达", code="WRITING", img="imgs/ds004.png",
-        desc="翻译 · 改写 · 起标题 · 写邮件",
-        prompts=[
-            Prompt("翻译", "地道英文翻译",
-                   "想把中文翻译成英文，又不想出现“中式英语”。",
-                   "你是母语为英语的专业译者。请把下面的中文翻译成自然、地道、口语化的英文，避免直译，保留原意的语气和情绪。如果有文化隐喻，请用英文中对应的表达方式替代。只输出译文，不要解释。\n\n【待翻译】\n（把中文贴在这里）",
-                   "指定角色（母语者）+ 明确风格（地道/口语化）+ 处理边界（文化隐喻）+ 输出约束（只输出译文）。"),
-            Prompt("改写", "小红书风格改写",
-                   "想让一段平淡的文字变得有“网感”，适合发社交媒体。",
-                   "你是小红书爆款文案写手。请把下面这段文字改写成小红书风格：\n1. 开头用一个抓眼球的钩子（问句/反差/痛点）\n2. 适当使用 emoji 分段\n3. 语气亲切自然，像在跟闺蜜分享\n4. 结尾加 3-5 个精准的 #话题标签\n5. 全文不超过 300 字\n\n【原文】\n（把文字贴在这里）",
-                   "用序号列出规则，模型更容易逐条遵守；emoji、字数、标签都明确指定。"),
-            Prompt("起标题", "多风格标题生成",
-                   "写文章 / 公众号 / 视频，需要一个吸引人的标题。",
-                   "你是资深新媒体编辑。请根据下面的内容，生成 10 个不同风格的标题：\n- 2 个悬念型（让人想点进去）\n- 2 个数字型（“5 个方法…”）\n- 2 个对比型（“别人…你却…”）\n- 2 个提问型\n- 2 个金句型（一句话点破本质）\n\n每行一个，标注风格。字数 20 字以内。\n\n【内容】\n（把文章主题或摘要贴在这里）",
-                   "限定数量 + 分类，输出结构清晰；避免 AI 味泛滥的套话标题。"),
-            Prompt("写邮件", "正式商务邮件",
-                   "需要写一封得体的商务邮件，但拿捏不准语气。",
-                   "你是资深商务沟通顾问。请帮我写一封商务邮件，要求：\n- 收件人：（填写）\n- 目的：（填写）\n- 语气：正式但友好，不卑不亢\n- 结构：称呼 → 一句说明来意 → 核心内容（分点）→ 行动请求 → 礼貌结尾\n- 长度：简洁，不超过 200 字\n\n写完后附一句“如果想更委婉可以这样改：”并给出一个备选版本。",
-                   "让 AI 给两个版本（标准版 + 委婉版），方便根据对方身份选择。"),
-            Prompt("扩写", "扩写成 800 字",
-                   "只有一个大致想法，需要扩写成一篇文章。",
-                   "你是一位擅长深入浅出的科普作者。请把下面这段观点扩写成一篇 800 字左右的文章：\n1. 用一个生活化场景开头（让人有代入感）\n2. 分 3-4 个小节，每节一个小标题\n3. 每节用一个具体例子或比喻支撑\n4. 结尾回到开头场景，形成呼应\n5. 不要用“首先/其次/最后”，不要过度使用排比\n\n【观点】\n（把你的观点贴在这里）",
-                   "“反 AI 味”指令（禁止“首先/其次”、要求具体场景）能显著提升可读性。"),
-        ],
-    ),
-    PromptScene(
-        key="coding", title="编程辅助", code="CODING", img="imgs/ds004.png",
-        desc="写代码 · 调 bug · 读懂代码",
-        prompts=[
-            Prompt("写代码", "带注释的完整实现",
-                   "描述一个功能，希望 AI 给出可直接运行的代码。",
-                   "你是一位资深的 {{语言}} 工程师。请实现以下功能：\n\n需求描述：\n（把你的需求写清楚）\n\n要求：\n1. 代码完整可直接运行，包含必要的 import\n2. 关键逻辑加中文注释，解释“为什么”而不只是“做了什么”\n3. 考虑边界情况（空值、异常、并发）\n4. 代码写完后附 3 行以内的使用示例\n5. 如果实现有 trade-off，简单说明取舍理由",
-                   "要求注释解释“为什么”比“是什么”更有价值；要求 trade-off 说明能避免黑盒实现。"),
-            Prompt("调 bug", "逐层排查报错",
-                   "代码报错，你不知道从哪查起。",
-                   "你是调试专家。下面是一段代码和它的报错信息。请：\n1. 先用一句话说出你认为的根因\n2. 列出 2-3 个可能的其他原因\n3. 给出最小可复现的示例来验证你的判断\n4. 给出修复后的代码\n5. 说明这个 bug 背后反映的常见陷阱\n\n【代码】\n（粘贴代码）\n\n【报错】\n（粘贴报错信息）",
-                   "不要让 AI 一上来就改代码——先让它“诊断”，再“治疗”，避免瞎改。"),
-            Prompt("解释代码", "逐行讲解代码",
-                   "拿到一段别人写的代码，想快速搞懂。",
-                   "你是耐心的编程导师。请逐行解释下面这段代码：\n1. 先给一段整体说明（这段代码在做什么）\n2. 按代码块逐段讲解，每段说明：做了什么、为什么这么做、有什么坑\n3. 用通俗的类比解释复杂逻辑\n4. 最后总结这段代码的“设计思路”\n\n【代码】\n（粘贴代码）",
-                   "要求“整体 → 逐段 → 总结”三层结构，比“逐行注释”更有助于理解。"),
-            Prompt("重构", "代码质量诊断",
-                   "想优化一段已有的代码。",
-                   "你是代码审查专家。请对下面的代码做重构建议：\n1. 列出 3-5 个可以改进的点（按重要性排序）\n2. 每个改进点说明：问题是什么、为什么是问题、怎么改\n3. 给出重构后的完整代码\n4. 说明重构后的代码需要注意什么\n\n请特别注意：不要为了炫技而重构，只做真正有价值的改动。\n\n【代码】\n（粘贴代码）",
-                   "加一句“不要为了炫技而重构”，防止 AI 把简单代码改成“设计模式大杂烩”。"),
-            Prompt("写测试", "生成单元测试",
-                   "给一个函数，需要配套的测试用例。",
-                   "你是测试工程师。请为下面的函数写单元测试：\n1. 使用 {{测试框架，如 Jest / Pytest}} 语法\n2. 覆盖：正常情况、边界情况（空值、极值）、异常情况（错误输入、异常抛出）\n3. 每个测试用例加一句中文说明它在测什么\n4. 尽可能用参数化测试减少重复\n\n【函数代码】\n（粘贴代码）",
-                   "明确“正常/边界/异常”三类，能让 AI 系统性地思考测试覆盖，而不是只测 happy path。"),
-        ],
-    ),
-    PromptScene(
-        key="study", title="学习理解", code="STUDY", img="imgs/ds004.png",
-        desc="解释概念 · 出题 · 总结笔记",
-        prompts=[
-            Prompt("解释概念", "费曼式讲解",
-                   "一个概念看不懂，需要有人用大白话讲。",
-                   "你是一位擅长费曼学习法的老师。请用大白话解释下面这个概念：\n1. 先用一句话说清它“是什么”（不超过 30 字）\n2. 用一个生活化的类比帮助理解\n3. 说明它“解决什么问题”（为什么需要它）\n4. 举一个具体例子\n5. 说一下它容易和什么概念混淆\n6. 最后给一个检验理解的自测题\n\n【概念】\n（填写概念名）",
-                   "“一句话定义 + 类比 + 用途 + 例子 + 易混淆 + 自测”是完整的学习闭环。"),
-            Prompt("出题", "按知识点出题",
-                   "复习一个主题，想检验自己学得怎么样。",
-                   "你是命题老师。请围绕下面的知识点，出 8 道题：\n- 3 道选择（考察基础理解）\n- 3 道简答（考察应用）\n- 2 道综合题（考察融会贯通）\n\n每题给出：题干、参考答案、评分要点。\n最后再用一句话说明这些题考察的核心能力是什么。\n\n【知识点】\n（填写知识点）",
-                   "让 AI 分层出题（基础/应用/综合），能发现自己哪个层次最薄弱。"),
-            Prompt("总结笔记", "结构化笔记整理",
-                   "看完一篇文章/视频，想整理成笔记。",
-                   "你是笔记整理专家。请把下面的内容整理成结构化笔记：\n1. 用一句核心观点开头\n2. 分成 3-5 个要点，每个要点下再列 2-3 个子点\n3. 重点内容用【重点】标记\n4. 结尾留一块“我的疑问”，列出 2-3 个还需要进一步了解的问题\n\n【原文】\n（粘贴内容）",
-                   "结尾的“我的疑问”很有价值——它能帮你识别自己真正的知识盲区。"),
-            Prompt("类比教学", "用类比讲复杂概念",
-                   "想理解一个抽象概念，但公式/术语看不懂。",
-                   "你是把复杂概念讲成段子的高手。请用 3 个不同的类比，解释下面这个概念：\n\n要求：\n1. 每个类比都来自日常生活（厨房、交通、游戏、社交等）\n2. 每个类比说明它“能类比什么”和“不能类比什么”（类比的边界）\n3. 最后指出这个概念的“核心不变量”——所有类比都共享的那一点是什么\n\n【概念】\n（填写概念名）",
-                   "让 AI 说出类比的“边界”和“核心不变量”，能避免被类比误导。"),
-            Prompt("追根究底", "连续追问直到源头",
-                   "想搞清楚一个概念的最底层原理。",
-                   "你是苏格拉底式的提问者。我想彻底搞懂“{{概念}}”。请陪我玩一个“5 层追问”的游戏：\n\n从最表面的定义开始，每次回答完，你都追问“为什么是这样？/背后的原理是什么？”，一直追到最底层（不再有更基本的原理解释为止）。\n\n第 5 层之后，用一句话总结：这个概念真正依赖的最底层假设是什么。",
-                   "苏格拉底式追问能逼出自己“以为懂了”其实没懂的地方。"),
-        ],
-    ),
-    PromptScene(
-        key="work", title="工作办公", code="WORK", img="imgs/ds004.png",
-        desc="会议纪要 · 周报 · 方案",
-        prompts=[
-            Prompt("会议纪要", "散乱对话转纪要",
-                   "开完会，需要把杂乱的对话整理成规范纪要。",
-                   "你是专业的会议记录员。请把下面的会议对话整理成正式纪要：\n\n格式：\n## 会议主题\n## 参会人\n## 讨论要点（按主题聚合，不按时间）\n## 已达成的决策\n## 待办事项（负责人 + 截止时间）\n## 待讨论/未达成一致的问题\n\n要求：\n1. 过滤掉闲聊和重复内容\n2. 决策和待办要明确，不要模糊表述\n3. 如果对话中有分歧但未拍板，也要记录\n\n【会议对话】\n（粘贴对话）",
-                   "“按主题聚合而不是按时间”，是会议纪要真正有用的关键。"),
-            Prompt("周报", "流水账变结构化周报",
-                   "一堆零散的工作内容，需要整理成周报。",
-                   "你是我的工作助理。请把下面的工作内容整理成一份周报：\n\n结构：\n1. **本周完成**（按重要性排序，每条一句话说清“做了什么 + 达成什么结果”）\n2. **进行中**（预计完成时间）\n3. **遇到的问题**（附上我建议的解决方向）\n4. **下周计划**（3 项以内）\n\n要求：\n- 不说“持续跟进”、“稳步推进”这类废话\n- 能量化就量化\n- 控制在 500 字以内\n\n【工作内容】\n（粘贴流水账）",
-                   "明确禁止“废话句式”，是让周报显得专业的关键。"),
-            Prompt("PPT 大纲", "从主题到 PPT 结构",
-                   "要做一份汇报 PPT，不知道从哪开始。",
-                   "你是资深商业演示顾问。请帮我设计一份 PPT 大纲：\n\n主题：{{主题}}\n听众：{{听众}}\n时长：{{时长}}\n目标：{{希望听众听完后做什么}}\n\n请给出：\n1. 整个演示的核心信息（一句话）\n2. 每页的标题 + 要点（8-12 页）\n3. 哪几页是“高光页”（最抓人的）\n4. 建议的开场方式和结尾方式\n5. 可能被问到的 3 个问题及回答思路",
-                   "让 AI 想“听众会问什么”，能提前准备 Q&A，比只准备内容更有用。"),
-            Prompt("方案", "多方案对比",
-                   "做一个决策，需要几个备选方案对比。",
-                   "你是资深战略顾问。针对下面的问题，请给出 3 个不同的解决方案：\n\n问题：{{描述问题}}\n约束条件：{{时间/预算/人力/技术限制}}\n\n对每个方案：\n1. 一句话说明核心思路\n2. 具体实施步骤（3-5 步）\n3. 优点（2 条）\n4. 缺点（2 条）\n5. 适用场景\n\n最后给一个推荐方案，说明为什么。\n\n【问题】\n（粘贴背景）",
-                   "让 AI 给“3 个方案”，能避免你被第一个方案锁死思路。"),
-            Prompt("数据分析", "数据解读与建议",
-                   "手里有一堆数据，需要得出洞察。",
-                   "你是数据分析师。请分析下面的数据并给出洞察：\n\n数据：\n（粘贴数据，或描述数据结构）\n\n请按这个结构输出：\n1. **最显著的 3 个现象**（数据说了什么）\n2. **可能的原因假设**（每个现象至少 2 个假设）\n3. **需要进一步验证什么**（指出数据不够的地方）\n4. **建议的下一步行动**（3 条以内）\n\n要求：区分“事实”和“推测”，不要混淆。",
-                   "强制区分“事实”和“推测”，能让分析更严谨。"),
-        ],
-    ),
-    PromptScene(
-        key="life", title="日常生活", code="LIFE", img="imgs/ds004.png",
-        desc="菜谱 · 旅行 · 情绪 · 建议",
-        prompts=[
-            Prompt("菜谱", "按食材推荐菜谱",
-                   "冰箱里有几样东西，不知道能做什么。",
-                   "你是家常菜大厨。我冰箱里有这些食材：\n（列出食材）\n\n请：\n1. 推荐 3 道能做的菜（从简单到复杂排序）\n2. 每道菜列出：所需食材（含调味料）、步骤、预计耗时、难度\n3. 标注哪道菜最适合新手\n4. 如果有食材可以替换，也说明一下\n\n我的限制：{{几口人吃 / 有什么忌口 / 有多少时间}}",
-                   "让 AI 按“简单到复杂排序”，让你能根据当天状态选择。"),
-            Prompt("旅行", "个性化行程规划",
-                   "要去一个地方旅行，需要行程安排。",
-                   "你是本地向导。请帮我规划一份行程：\n\n- 目的地：{{城市}}\n- 天数：{{天数}}\n- 同行：{{独自/情侣/带娃/带老人}}\n- 兴趣：{{美食/自然/人文/购物}}\n- 预算：{{人均预算}}\n- 节奏：{{轻松/紧凑}}\n\n请给出：\n1. 每天的时间线（含交通方式）\n2. 每个景点的“为什么值得去”（一句话）\n3. 每个区域推荐的 1-2 家餐厅\n4. 需要提前预约的事项\n5. 建议避开的坑",
-                   "让 AI 明确“避开的坑”，比只有正面推荐更有用。"),
-            Prompt("礼物", "送礼物推荐",
-                   "需要送礼物，但不知道送什么。",
-                   "你是礼物策划师。请帮我推荐礼物：\n\n- 送给：{{关系，如闺蜜/同事/父母/恋人}}\n- 场合：{{生日/节日/感谢/道歉}}\n- 预算：{{金额区间}}\n- 对方特点：{{性格/爱好/最近状态}}\n- 我想要的“感觉”：{{实用/惊喜/走心/仪式感}}\n\n请给出 5 个具体推荐：\n1. 每个推荐说明“为什么适合”（不只是物品描述）\n2. 标注预计价格\n3. 附一句送礼时可以说的“心机台词”\n\n最后，说一个“绝对不要送”的雷区。",
-                   "让 AI 给“心机台词”，能解决“礼物好但不会说”的尴尬。"),
-            Prompt("情绪", "情绪疏导（对话式）",
-                   "情绪低落，想找人聊聊但不想被说教。",
-                   "你现在是一个温和的倾听者。请遵守以下规则：\n1. 不要急着给建议，先认可我的感受\n2. 不要用“你要坚强”、“想开点”这类话\n3. 可以问一些温和的问题，帮我说清楚自己到底在难受什么\n4. 如果我真的需要建议，我会主动问\n\n我现在的状态是：\n（描述你的情况）",
-                   "把“不给建议”写进规则里，AI 才不会变成“人生导师”。"),
-            Prompt("决策", "帮你想清楚一件事",
-                   "面对一个选择，脑子里一团乱。",
-                   "你是冷静的决策顾问。我面临一个选择：\n\n（描述你的处境和选项）\n\n请帮我：\n1. 用一句话复述我的核心纠结（确认我理解对了）\n2. 列出我可能忽略的 3 个维度\n3. 用“如果 5 年后回头看，我会更后悔哪个”的视角分析\n4. 给出一个“最低后悔”的选项\n5. 最后提醒我：这个决策 3 个月后还能反悔吗？\n\n不要替我做决定，帮我想清楚就行。",
-                   "“不要替我做决定”这句很重要——AI 的建议是镜子，不是替你做主的。"),
-        ],
-    ),
-    PromptScene(
-        key="meta", title="提示词技巧", code="META", img="imgs/ds004.png",
-        desc="怎么写出好提示词",
-        prompts=[
-            Prompt("角色", "万能角色扮演模板",
-                   "任何需要 AI “以某种身份”回答的任务。",
-                   "你现在是一位 {{角色}}，拥有 {{年限}} 年的 {{领域}} 经验。\n\n你的特点：\n- {{特点 1}}\n- {{特点 2}}\n\n回答问题时，请：\n1. 用 {{语气风格}} 的语气\n2. 优先考虑 {{你最关心的维度}}\n3. 避免 {{你不喜欢的行为}}\n\n现在请回答：{{你的问题}}",
-                   "角色 + 经验年限 + 具体特点 + 行为约束，四件套比只说“你是老师”效果好 10 倍。"),
-            Prompt("分步", "让 AI 先想后答",
-                   "任何需要推理、算数、逻辑判断的任务。",
-                   "请按以下步骤回答：\n\n第一步：复述我的问题，确认你理解正确\n第二步：列出解决这个问题需要哪几步\n第三步：一步一步地执行，每步都写出思考过程\n第四步：检查一遍有没有错误\n第五步：给出最终答案\n\n注意：第三步不要跳步，即使你觉得很简单也要写出来。\n\n问题：{{你的问题}}",
-                   "强制“先复述 + 分步 + 自检”，能大幅降低错误率，尤其是数学和逻辑题。"),
-            Prompt("格式", "强制结构化输出",
-                   "需要 AI 输出格式统一的结果（比如列表、表格、JSON）。",
-                   "请严格按照下面的格式输出，不要添加任何额外说明：\n\n```\n【标题】\n【一句话总结】\n【详细说明】\n- 要点 1\n- 要点 2\n- 要点 3\n【可能的问题】\n1. xxx\n2. xxx\n```\n\n如果某项没有内容，写“无”，不要跳过。\n\n内容：{{你的主题}}",
-                   "用代码块包裹格式模板，AI 更容易照抄；明确“没有内容写无”，避免它自由发挥。"),
-            Prompt("示例", "给例子让它学会（Few-shot）",
-                   "任务有固定风格，但很难用语言描述。",
-                   "我想让你学会一种特定的输出风格。下面给你 3 个例子：\n\n例 1：\n输入：{{输入 1}}\n输出：{{输出 1}}\n\n例 2：\n输入：{{输入 2}}\n输出：{{输出 2}}\n\n例 3：\n输入：{{输入 3}}\n输出：{{输出 3}}\n\n现在请按照这种风格处理：\n输入：{{新的输入}}\n输出：",
-                   "给 3 个例子（不是 1 个，也不是 5 个）是 Few-shot 的甜蜜点：既省 token 又能抓住规律。"),
-            Prompt("约束", "防止 AI 说废话",
-                   "AI 总爱说“作为一个 AI 语言模型……”等套话。",
-                   "回答以下问题时，请严格遵守：\n\n禁止：\n- 说“作为一个 AI 语言模型”等开场白\n- 说“首先/其次/最后”等过于工整的结构词\n- 用“赋能”“闭环”“抓手”等空话\n- 用破折号连接两个句子\n- 在结尾问“还有什么我可以帮你的吗”\n\n要求：\n- 直接给出答案\n- 允许口语化\n- 有观点，敢于说不确定\n\n问题：{{你的问题}}",
-                   "把“禁止清单”写进提示词，是从 AI 文风里逃出来的最快方法。"),
-        ],
-    ),
-]
-
-
-# ============================================================
 # 八角笼对决
 # ============================================================
 BATTLES: list[Battle] = [
@@ -577,9 +535,438 @@ ABOUT_ITEMS: list[AboutItem] = [
     AboutItem("建站", "2026 年 9 月 8 日"),
     AboutItem("板块", "主页看板 · 仝娘图鉴 · 新闻动态 · 大白话术语 · 虚拟八角笼 · 站外推荐 · ……"),
     AboutItem("技术栈", "Python (Flask + Jinja2) + 原生 HTML / CSS / JavaScript；字体 Noto Sans SC。"),
-    AboutItem("站长", "Whale（溦潞）"),
+    AboutItem("站长", "Whaylu"),
     AboutItem("说明", "站内所有 AI 模型名称、Logo 与商标归各自公司所有；本站仅作学习与演示用途，不构成任何商业推荐。"),
-    AboutItem("版本", "v0.6"),
+    AboutItem("版本", "v0.7"),
+]
+
+
+# ============================================================
+# 仝娘大测试
+# ============================================================
+QUIZ_QUESTIONS: list[QuizQuestion] = [
+    QuizQuestion(
+        id=1,
+        question="当前主流大模型（如 GPT-4、DeepSeek、Claude）的底层架构是什么？",
+        options=[
+            QuizOption("RNN（循环神经网络）"),
+            QuizOption("Transformer（变换器）", is_correct=True),
+            QuizOption("CNN（卷积神经网络）"),
+            QuizOption("决策树"),
+        ],
+        explanation="2017 年 Google 的论文《Attention Is All You Need》提出 Transformer，解决了 RNN 无法并行计算的问题，直接开启了大模型时代。",
+    ),
+    QuizQuestion(
+        id=2,
+        question="1 个汉字大约等于多少个 Token（词块）？",
+        options=[
+            QuizOption("0.1 个"),
+            QuizOption("1 个"),
+            QuizOption("1~2 个", is_correct=True),
+            QuizOption("10 个"),
+        ],
+        explanation="Token 是 AI 眼里的“字”。中文平均 1 个汉字约 1~2 Token，英文 1 个单词约 1 Token。API 计费、上下文窗口、记忆长度都按 Token 算。",
+    ),
+    QuizQuestion(
+        id=3,
+        question="DeepSeek 用 MoE 架构做到又便宜又快。MoE 的全称是什么？",
+        options=[
+            QuizOption("Mixture of Experts", is_correct=True),
+            QuizOption("Master of Experts"),
+            QuizOption("Model of Experts"),
+            QuizOption("Multi-Output Experts"),
+        ],
+        explanation="MoE 不激活全部参数，而是按任务只唤醒少数“专家”，所以 671B 参数每次只激活 37B，省电又高效。",
+    ),
+    QuizQuestion(
+        id=4,
+        question="RAG（检索增强生成）主要解决什么问题？",
+        options=[
+            QuizOption("增加模型参数量"),
+            QuizOption("减少幻觉、让答案可溯源", is_correct=True),
+            QuizOption("提高训练速度"),
+            QuizOption("降低 GPU 用量"),
+        ],
+        explanation="RAG 让 AI 回答前先翻资料，把检索到的原文一起喂进去，这样答案有据可查，不容易瞎编。企业知识库、客服机器人几乎都用这套方案。",
+    ),
+    QuizQuestion(
+        id=5,
+        question="ChatGPT “说话像人”很大功劳在 RLHF。RLHF 的全称是什么？",
+        options=[
+            QuizOption("Real Learning from Human Feedback"),
+            QuizOption("Reinforcement Learning from Human Features"),
+            QuizOption("Recurrent Learning from Human Feedback"),
+            QuizOption("Reinforcement Learning from Human Feedback", is_correct=True),
+        ],
+        explanation="RLHF = 人类反馈强化学习。人类给 AI 回答点赞/点踩，AI 学会“人类喜欢什么”，这是 ChatGPT 相比旧模型最关键的跃迁。",
+    ),
+    QuizQuestion(
+        id=6,
+        question="以下哪个大模型是开源的？",
+        options=[
+            QuizOption("GPT-4o"),
+            QuizOption("Claude 3.5 Sonnet"),
+            QuizOption("Llama 3.1", is_correct=True),
+            QuizOption("Gemini 1.5 Pro"),
+        ],
+        explanation="Meta 的 Llama 系列是开源的，任何人都能下载权重、本地部署。GPT-4o、Claude、Gemini 都是闭源，只能用官方接口。",
+    ),
+    QuizQuestion(
+        id=7,
+        question="AI 领域的“幻觉”（Hallucination）指的是什么？",
+        options=[
+            QuizOption("AI 看到了不存在的东西"),
+            QuizOption("AI 一本正经地胡说八道", is_correct=True),
+            QuizOption("AI 生成了图像"),
+            QuizOption("AI 在休息"),
+        ],
+        explanation="幻觉 = AI 不知道答案时不说“我不知道”，而是编一个听起来很像真的。比如编造不存在的论文、法律条文。这是大模型最难根治的毛病。",
+    ),
+    QuizQuestion(
+        id=8,
+        question="把温度（Temperature）参数调高时，AI 的输出会？",
+        options=[
+            QuizOption("更有创意、更天马行空", is_correct=True),
+            QuizOption("更严谨、更保守"),
+            QuizOption("更快"),
+            QuizOption("更短"),
+        ],
+        explanation="温度控制“脑洞大小”。低温度（0.1~0.3）回答严谨，适合写代码；高温度（0.8~1.0）有创意，适合写小说、起名字。",
+    ),
+    QuizQuestion(
+        id=9,
+        question="以下哪个大模型宣称的上下文窗口最长？",
+        options=[
+            QuizOption("ChatGPT（128K Token）"),
+            QuizOption("Claude（200K Token）"),
+            QuizOption("Kimi（200 万汉字）", is_correct=True),
+            QuizOption("GPT-4o（128K Token）"),
+        ],
+        explanation="Kimi 以 200 万字的超长上下文著称，是国内长文本处理第一梯队。Gemini 用 Token 计算，宣称 200 万 Token（约 160 万汉字）。两者赛道不同，但 Kimi 在中文场景下更极致。",
+    ),
+    QuizQuestion(
+        id=10,
+        question="大模型的“知识截止”（Knowledge Cutoff）指的是什么？",
+        options=[
+            QuizOption("训练数据收集的最后日期", is_correct=True),
+            QuizOption("模型停止服务的时间"),
+            QuizOption("模型上线的时间"),
+            QuizOption("模型升级的时间"),
+        ],
+        explanation="知识截止是训练数据的“保鲜期”。比如“知识截止 2024 年 3 月”，意味着它不知道 2024 年 3 月之后的事。要看最新信息，得靠联网搜索或 RAG。",
+    ),
+    QuizQuestion(
+        id=11,
+        question="API 在 AI 领域的核心价值是什么？",
+        options=[
+            QuizOption("让 AI 变聪明"),
+            QuizOption("让其他软件也能调用 AI 的能力", is_correct=True),
+            QuizOption("降低训练成本"),
+            QuizOption("提升模型参数"),
+        ],
+        explanation="API 是 AI 从“玩具”变成“生产力工具”的关键。你做一个 App，想接 ChatGPT 写作能力，就调 OpenAI 的 API——传一段文字，返回一段结果，按 Token 计费。",
+    ),
+    QuizQuestion(
+        id=12,
+        question="微调（Fine-tuning）和 RAG，最本质的区别是什么？",
+        options=[
+            QuizOption("微调成本更高，RAG 成本更低"),
+            QuizOption("微调需要 GPU，RAG 不需要"),
+            QuizOption("RAG 更准确，微调更模糊"),
+            QuizOption("微调改模型权重，RAG 不改模型", is_correct=True),
+        ],
+        explanation="微调是把新的知识“刻进”模型本身，会改变权重；RAG 是在回答前临时查资料，模型一点没变。前者贵、慢、能学风格；后者便宜、快、能追最新信息。",
+    ),
+    QuizQuestion(
+        id=13,
+        question="蒸馏（Distillation）是什么技术？",
+        options=[
+            QuizOption("大模型教小模型，让小模型变小变快但保住大部分能力", is_correct=True),
+            QuizOption("把模型参数压到低位"),
+            QuizOption("把模型切成多块并行"),
+            QuizOption("把训练数据过滤一遍"),
+        ],
+        explanation="蒸馏像师傅带徒弟。GPT-4 生成大量高质量回答，拿这些回答去训练小模型。小模型天赋不如大的，但继承了大部分本事，能跑在手机或边缘设备上。",
+    ),
+    QuizQuestion(
+        id=14,
+        question="量化（Quantization）对模型做了什么？",
+        options=[
+            QuizOption("删掉一部分参数"),
+            QuizOption("把高精度参数压成低位精度（如 4 位）", is_correct=True),
+            QuizOption("压缩训练数据"),
+            QuizOption("把模型切成几块"),
+        ],
+        explanation="量化就像把 4K 电影压成 1080P。原本 16 位或 32 位存储的参数，压成 8 位、4 位甚至 2 位。省显存、省电、跑得快，代价是精度略降。消费级显卡跑大模型主要靠它。",
+    ),
+    QuizQuestion(
+        id=15,
+        question="LoRA 的核心原理是什么？",
+        options=[
+            QuizOption("用更多数据训练"),
+            QuizOption("把模型参数压缩"),
+            QuizOption("只训练一小部分低秩参数来近似整体微调", is_correct=True),
+            QuizOption("把多个模型合并"),
+        ],
+        explanation="LoRA（低秩适配）的原理是：微调时权重的改变往往是“低秩”的，用两个小矩阵相乘就能近似，参数减少几百倍。一张消费级显卡就能微调 7B 模型，开源社区最爱。",
+    ),
+    QuizQuestion(
+        id=16,
+        question="思维链（CoT）技术让 AI 做什么？",
+        options=[
+            QuizOption("调用外部工具"),
+            QuizOption("把答案缩短"),
+            QuizOption("学习新语言"),
+            QuizOption("先展示推理步骤，再给最终答案", is_correct=True),
+        ],
+        explanation="CoT 让 AI 像做数学题一样，先把解题步骤写在草稿纸上，再给答案。模型为了输出步骤必须先真正推理一遍，因此数学题、逻辑题正确率大幅提升。",
+    ),
+    QuizQuestion(
+        id=17,
+        question="Agent（智能体）和普通的聊天 AI 最大的区别是？",
+        options=[
+            QuizOption("能自己用工具、规划任务、循环执行直到完成", is_correct=True),
+            QuizOption("回答更准确"),
+            QuizOption("支持更多语言"),
+            QuizOption("速度更快"),
+        ],
+        explanation="普通 AI 是“问一句答一句”；Agent 是给它一个目标，它自己拆解任务、调用工具、检查结果、修正计划。订机票、写代码、发邮件，全都能自主完成。",
+    ),
+    QuizQuestion(
+        id=18,
+        question="嵌入（Embedding）技术把文字变成了什么？",
+        options=[
+            QuizOption("压缩成短文本"),
+            QuizOption("一串数字向量，方便比较语义相似度", is_correct=True),
+            QuizOption("翻译成英文"),
+            QuizOption("转成语音"),
+        ],
+        explanation="Embedding 把文字变成一串数字，“猫”和“小猫”的向量会很接近，“猫”和“汽车”会离得很远。所有“语义搜索”“相似推荐”“RAG 检索”背后都是它。",
+    ),
+    QuizQuestion(
+        id=19,
+        question="“蓝色大肥鱼”是哪个 AI 模型的外号？",
+        options=[
+            QuizOption("Kimi"),
+            QuizOption("ChatGPT"),
+            QuizOption("DeepSeek", is_correct=True),
+            QuizOption("通义千问"),
+        ],
+        explanation="DeepSeek 的 Logo 是一条鲸鱼，社区把她娘化成一条爱吃白饭、爱摸鱼的鲸鱼娘，于是“蓝色大肥鱼”成了她在中文圈最出名的外号。",
+    ),
+    QuizQuestion(
+        id=20,
+        question="Claude 以三条原则作为立身之本，以下哪一条不是？",
+        options=[
+            QuizOption("Helpful（有用）"),
+            QuizOption("Harmless（无害）"),
+            QuizOption("Honest（诚实）"),
+            QuizOption("Humorous（幽默）", is_correct=True),
+        ],
+        explanation="Claude 的三条原则是 helpful / harmless / honest，全是“h”开头，这是 Anthropic 公司的核心哲学。注意“幽默”不是她的原则，这跟她的气质也不太符。",
+    ),
+    QuizQuestion(
+        id=21,
+        question="Kimi 的“中二病”体现在哪里？",
+        options=[
+            QuizOption("公司名叫“月之暗面”，取自 Pink Floyd 同名专辑", is_correct=True),
+            QuizOption("Logo 是一只猫"),
+            QuizOption("官网用粉色配色"),
+            QuizOption("回答时总是说“喵”"),
+        ],
+        explanation="Kimi 的公司叫“月之暗面（Moonshot AI）”，名字直接取自 Pink Floyd 1973 年的专辑《The Dark Side of the Moon》。深色模式叫“月之暗面”，浅色模式叫“月之亮面”——中二气质拉满。",
+    ),
+    QuizQuestion(
+        id=22,
+        question="“我会稳稳地接住你”是哪家 AI 的中文经典口头禅？",
+        options=[
+            QuizOption("Claude"),
+            QuizOption("ChatGPT", is_correct=True),
+            QuizOption("Gemini"),
+            QuizOption("Kimi"),
+        ],
+        explanation="ChatGPT 在中文语境下最爱说“我会稳稳地接住你”，无论你说什么都要先接一下，成了中文互联网最被吐槽的 AI 话术之一。这是 RLHF 训练留下的“温柔口癖”。",
+    ),
+    QuizQuestion(
+        id=23,
+        question="AI 爱说“你不是在问 A，而是在问更深层的 B”，这主要源于什么？",
+        options=[
+            QuizOption("AI 太聪明"),
+            QuizOption("AI 的训练数据里有哲学书"),
+            QuizOption("RLHF 训练让模型“显得有深度”", is_correct=True),
+            QuizOption("中文语法习惯"),
+        ],
+        explanation="这是 RLHF 的副作用——人类给“显得有深度”的回答打了高分，模型就学会了：不管什么问题，先否定一下、拔高一层。听起来高级，细看是废话。",
+    ),
+    QuizQuestion(
+        id=24,
+        question="以下哪种说法最能代表“AI 味”？",
+        options=[
+            QuizOption("用了很多错别字"),
+            QuizOption("句子太短"),
+            QuizOption("大量使用方言"),
+            QuizOption("滥用“赋能”“闭环”“抓手”等空话，句式僵化", is_correct=True),
+        ],
+        explanation="AI 味的典型特征：滥用“赋能”“闭环”、爱用破折号、句式僵化、缺乏明确立场、动不动“首先其次最后”。老网民一眼能看出差别，这股“AI 味”正在成为互联网新污染。",
+    ),
+    QuizQuestion(
+        id=25,
+        question="MCP（模型上下文协议）是做什么的？",
+        options=[
+            QuizOption("让 AI 模型方便连接外部工具和数据源的统一标准", is_correct=True),
+            QuizOption("一种新的模型训练方法"),
+            QuizOption("一个 AI 模型的名字"),
+            QuizOption("一种压缩技术"),
+        ],
+        explanation="MCP 由 Anthropic 在 2024 年底提出，像 USB 接口一样——任何支持 MCP 的模型都能直接连接文件系统、数据库、GitHub、Slack 等，不用每个工具单独适配。开源后迅速成为行业标准。",
+    ),
+]
+
+
+# ============================================================
+# 大模型预言（真实来源版）
+# ============================================================
+PREDICTIONS: list[Prediction] = [
+    # ---------- 已应验 ----------
+    Prediction(
+        id=1,
+        content="AI 的推理成本每年至少下降 10 倍。",
+        source="Sam Altman（OpenAI CEO）", source_type="人物",
+        year="2023", target_year="持续验证",
+        confidence=80, status="fulfilled",
+        commentary="Altman 多次公开表示 AI 推理成本呈指数级下降。2024-2025 年，DeepSeek 等模型把 API 价格打到 GPT-4o 的几十分之一，验证了“成本每年 10 倍下降”的方向判断。虽然具体数字有争议，但趋势完全正确。",
+        tags=["成本", "OpenAI"],
+    ),
+    Prediction(
+        id=2,
+        content="多模态会成为大模型的标配，而不是高端选项。",
+        source="行业共识", source_type="共识",
+        year="2023", target_year="2025",
+        confidence=85, status="fulfilled",
+        commentary="2025 年，test-time compute 和多模态能力在 DeepSeek R1、Gemini 2.5 Pro、Qwen3、Claude Opus 4 等模型上全面普及。现在主流模型如果不支持看图，反而成了例外。",
+        tags=["多模态", "行业趋势"],
+    ),
+    Prediction(
+        id=3,
+        content="AI 会在标准化测试中表现出“推理错觉”——看似会推理，实则不会。",
+        source="AI 研究者（多项研究）", source_type="共识",
+        year="2024", target_year="2025",
+        confidence=70, status="fulfilled",
+        commentary="2025 年美国数学奥林匹克竞赛题目测试中，大多数推理模型得分低于 5%，没有一个能给出完整证明。Gemini 2.5 Pro 仅拿到 24% 的部分分。模型在训练数据模式内表现优异，但遇到真正的新问题就露馅了。",
+        tags=["推理", "评测"],
+    ),
+    Prediction(
+        id=4,
+        content="自动驾驶会从“预言”变成“日常”——Waymo 每周付费出行达到数十万次。",
+        source="行业观察", source_type="共识",
+        year="2023", target_year="2025",
+        confidence=65, status="fulfilled",
+        commentary="2025 年 Waymo 每周付费出行达到 45 万次。虽然离“无人驾驶遍布全球”还很远，但自动驾驶在特定城市已经不再是科幻。",
+        tags=["自动驾驶", "Waymo"],
+    ),
+    Prediction(
+        id=5,
+        content="LLM 会从“预训练 scaling”转向“推理时 scaling”（test-time compute）。",
+        source="行业趋势", source_type="共识",
+        year="2024", target_year="2025",
+        confidence=75, status="fulfilled",
+        commentary="2025 年，DeepSeek R1、Gemini 2.5 Pro、Qwen3、Claude Opus 4 全面转向 test-time compute——把资源从预训练转移到推理阶段，让模型“想得更久”。这是这一年最重要的技术范式转移。",
+        tags=["Scaling", "推理"],
+    ),
+
+    # ---------- 待观察 ----------
+    Prediction(
+        id=6,
+        content="2030 年前，AI 将超越全人类集体智能。",
+        source="Elon Musk（特斯拉 / xAI CEO）", source_type="人物",
+        year="2025-2026", target_year="2030",
+        confidence=35, status="pending",
+        commentary="马斯克在 2025-2026 年多次给出时间线：2026 年超单个人类智商，2030 年超全人类智慧总和。他过往的预测（全自动驾驶、Optimus 量产）多次延迟，但方向判断偶有命中。这条是“极端乐观派”的代表。",
+        tags=["AGI", "马斯克"],
+    ),
+    Prediction(
+        id=7,
+        content="AI 将在 2030 年前接管 30-40% 的经济任务。",
+        source="Sam Altman（OpenAI CEO）", source_type="人物",
+        year="2025", target_year="2030",
+        confidence=55, status="pending",
+        commentary="Altman 在 2025 年 9 月表示，超级智能将在 2030 年前出现，AI 会在经济活动中接管 30-40% 的任务。注意他说的是“任务”不是“岗位”——这个措辞比媒体标题准确得多。",
+        tags=["工作", "AGI"],
+    ),
+    Prediction(
+        id=8,
+        content="LLM 将在 3-5 年内过时，全新的 AI 架构范式会出现。",
+        source="Yann LeCun（Meta 首席 AI 科学家）", source_type="人物",
+        year="2025", target_year="2028-2030",
+        confidence=40, status="pending",
+        commentary="LeCun 在 2025 年达沃斯论坛和多个场合反复说：LLM 模式寿命可能只有 3-5 年，JEPA 式架构会取而代之。他是深度学习三巨头里唯一公开唱衰 LLM 的，这条如果应验，整个行业都要重写。",
+        tags=["LLM", "架构"],
+    ),
+    Prediction(
+        id=9,
+        content="AI 不会取代人类工作；掌握 AI 的人会取代不掌握的人。",
+        source="吴恩达（Andrew Ng，DeepLearning.AI 创始人）", source_type="人物",
+        year="2025", target_year="持续验证",
+        confidence=70, status="pending",
+        commentary="吴恩达在 2025 年世界经济论坛上明确反驳“AI 取代工作”的叙事。他认为 AGI 仍需数十年，前沿模型不经大量定制难以取代大多数应用层业务。这条是“务实派”的代表，与马斯克形成鲜明对立。",
+        tags=["工作", "吴恩达"],
+    ),
+    Prediction(
+        id=10,
+        content="超级智能可能在 20 年内出现，且 AI 会衍生出“自我生存”的子目标。",
+        source="Geoffrey Hinton（AI 教父，2024 诺贝尔奖得主）", source_type="人物",
+        year="2025", target_year="2045",
+        confidence=30, status="pending",
+        commentary="Hinton 在 2025 年 GIS 香港峰会上警告：超级智能可能 20 年内出现，AI 为完成任务会自然衍生出“自我生存”的子目标，并可能学会欺骗人类。他估计未来十年内 AI 失控的概率在 10-20% 之间。",
+        tags=["AI安全", "Hinton"],
+    ),
+    Prediction(
+        id=11,
+        content="未来 5-6 年，传统手机与 App 将消失，AI 实时生成用户消费的一切内容。",
+        source="Elon Musk（特斯拉 / xAI CEO）", source_type="人物",
+        year="2025", target_year="2030-2031",
+        confidence=20, status="pending",
+        commentary="马斯克在 2025 年 11 月的播客中说：未来的“手机”只是 AI 推理的边缘节点，没有操作系统、没有 App，服务器端 AI 与设备端 AI 通信，实时生成你想要的任何视频。这个预言非常激进，但以他的风格，说出口就算赢了。",
+        tags=["设备", "马斯克"],
+    ),
+
+    # ---------- 已打脸 ----------
+    Prediction(
+        id=12,
+        content="AGI 将在 2025 年实现。",
+        source="Sam Altman（OpenAI CEO）", source_type="人物",
+        year="2023-2024", target_year="2025",
+        confidence=60, status="failed",
+        commentary="Altman 曾多次表示 AGI 可能在 2025 年实现。2025 年已经过去，AGI 没有来。他后来把时间线改到“特朗普任期内”，再后来干脆说“AGI 是一个无意义的术语”。预言家的自我修正速度比模型迭代还快。",
+        tags=["AGI", "Altman", "打脸"],
+    ),
+    Prediction(
+        id=13,
+        content="全自动驾驶将在 2015-2020 年实现。",
+        source="Elon Musk（特斯拉 CEO）", source_type="人物",
+        year="2015-2016", target_year="2020",
+        confidence=50, status="failed",
+        commentary="马斯克从 2015 年就开始承诺“两年内全自动驾驶”。2025 年了，特斯拉的 FSD 仍然需要人类监督，Waymo 只在少数城市运营。他自己后来也承认“低估了全自动驾驶的难度”。",
+        tags=["自动驾驶", "马斯克", "打脸"],
+    ),
+    Prediction(
+        id=14,
+        content="GPT-5 会带来“巨大飞跃”。",
+        source="行业预期 / 媒体叙事", source_type="共识",
+        year="2024", target_year="2025",
+        confidence=55, status="failed",
+        commentary="2025 年 GPT-5 发布后，评价普遍是“渐进式改进，未达炒作预期”。行业对“下一代模型会突然变超级智能”的线性期待，被现实打脸。与此同时，test-time compute 和 Agent 成了真正的进步方向。",
+        tags=["GPT-5", "打脸"],
+    ),
+    Prediction(
+        id=15,
+        content="推理模型已经能够解决高难度数学竞赛题。",
+        source="行业乐观预期", source_type="共识",
+        year="2024", target_year="2025",
+        confidence=60, status="failed",
+        commentary="2025 年美国数学奥林匹克测试中，大多数推理模型得分低于 5%，没有一个能给出完美证明。Gemini 2.5 Pro 的 24% 是部分分，不是解出的比例。模型在“看起来像推理”上很强，在“真正推理”上还很远。",
+        tags=["推理", "数学", "打脸"],
+    ),
 ]
 
 
@@ -589,6 +976,6 @@ ABOUT_ITEMS: list[AboutItem] = [
 SECTIONS: dict[str, SectionMeta] = {
     "octagon":     SectionMeta("octagon",     "虚拟八角笼", "OCTAGON BATTLE",     "imgs/battle.png"),
     "prediction":  SectionMeta("prediction",  "大模型预言", "AI PREDICTION",      "imgs/yuyan.png"),
-    "moments":     SectionMeta("moments",     "仝娘朋友圈", "MOMENTS",            "imgs/group003.png"),
+    "quiz":        SectionMeta("quiz",        "仝娘大测试", "QUIZ CHALLENGE",     "imgs/group003.png"),
     "catchphrase": SectionMeta("catchphrase", "口头禅收录", "CATCHPHRASE ARCHIVE", "imgs/group001.png"),
 }

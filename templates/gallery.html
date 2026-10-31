@@ -64,7 +64,9 @@
               <span class="card-code">#{{ c.code }}</span>
               <span class="card-score">{{ hit.score }}分</span>
               <img class="card-img" src="{{ url_for('static', filename=c.logo_url) }}"
-                   alt="{{ c.name }}" draggable="false" loading="lazy">
+                   alt="{{ c.name }}" draggable="false" loading="lazy"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="card-img-placeholder" style="display:none;">暂无图标</div>
               <div class="card-title">{{ c.name|safe }}</div>
               <div class="card-tag">{{ c.title }}</div>
               {% if hit.matched_fields %}

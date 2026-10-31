@@ -1714,3 +1714,959 @@ mark {
   color: #c94916;
   font-size: 10px;
 }
+
+/* ================= 命运邂逅 ================= */
+
+.discover-lead {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.discover-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.discover-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.discover-group-label {
+  flex: 0 0 42px;
+  padding-top: 6px;
+  font-size: var(--font-xs);
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: .08em;
+}
+
+.discover-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.discover-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.discover-tag:hover {
+  color: var(--accent-warm);
+  border-color: var(--accent-warm);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+.discover-tag.active {
+  background: var(--accent-warm);
+  color: #ffffff;
+  border-color: var(--accent-warm);
+}
+
+.discover-tag.active:hover {
+  background: #e05a2b;
+  color: #ffffff;
+}
+
+.discover-tag-count {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: #faf6f0;
+  padding: 1px 6px;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.discover-tag.active .discover-tag-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.tag-x {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-left: 2px;
+}
+
+.discover-cta {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.discover-more-btn {
+  display: inline-block;
+  padding: 10px 22px;
+  border: 1.5px solid var(--accent-warm);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  font-size: var(--font-sm);
+  font-weight: 800;
+  color: var(--accent-warm);
+  transition: all 0.2s ease;
+}
+
+.discover-more-btn:hover {
+  background: var(--accent-warm);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 已选标签条 */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #fffaf3;
+  border: 1px dashed var(--accent-yellow);
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+}
+
+.selected-label {
+  font-size: var(--font-xs);
+  font-weight: 800;
+  color: var(--text-sub);
+}
+
+.selected-chip {
+  padding: 3px 10px;
+  background: var(--accent-warm);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: 700;
+}
+
+.selected-clear {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.selected-clear:hover {
+  color: #d94b3c;
+}
+
+.discover-result-header {
+  margin: 24px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--warmer-border);
+}
+
+.discover-result-count {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+}
+
+.discover-result-count b {
+  color: var(--accent-warm);
+  font-weight: 800;
+  font-size: var(--font-md);
+}
+
+/* 移动端 */
+@media (max-width: 768px) {
+  .discover-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .discover-group-label {
+    flex: none;
+    padding-top: 0;
+  }
+}
+
+/* ================= 命运邂逅 · 分制推荐 ================= */
+
+.discover-card {
+  position: relative;
+}
+
+.discover-card .card-score {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-warm);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.discover-hit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--warmer-border);
+  justify-content: center;
+  width: 100%;
+}
+
+.hit-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-warm);
+  background: var(--accent-soft);
+  padding: 2px 7px;
+  border-radius: 5px;
+  line-height: 1.4;
+}
+
+.discover-lead strong {
+  color: var(--accent-warm);
+  font-weight: 800;
+}
+
+/* ================= 命运邂逅 · 主页快捷入口 ================= */
+
+.discover-quick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.discover-more-link {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--accent-warm);
+  padding: 6px 12px;
+  border: 1px solid var(--accent-warm);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.discover-more-link:hover {
+  background: var(--accent-warm);
+  color: #ffffff;
+}
+
+/* ================= 命运邂逅 · 主页卡片 ================= */
+
+.discover-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+.discover-quick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 10px;
+  min-height: 96px;
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-photo);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.discover-quick-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-warm);
+  box-shadow: var(--shadow-hover);
+}
+
+.discover-quick-label {
+  font-size: var(--font-md);
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.discover-quick-count {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--accent-warm);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* 第 6 张：更多筛选 */
+.discover-quick-more {
+  background: linear-gradient(135deg, #ffffff 0%, #fef5f0 100%);
+  border: 2px dashed var(--accent-warm);
+}
+
+.discover-quick-more:hover {
+  border-style: solid;
+  border-color: var(--accent-warm);
+}
+
+.discover-quick-arrow {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--accent-warm);
+  line-height: 1;
+}
+
+/* 响应式降级 */
+@media (max-width: 1024px) {
+  .discover-quick-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .discover-quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ================= 图片缺失占位 ================= */
+
+/* 卡片图标占位 —— 尺寸与 .card-img 完全一致 */
+.card-img-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 110px;
+  margin: 14px 0 10px;
+  border-radius: var(--radius-sm);
+  background: #faf6f0;
+  border: 1.5px dashed var(--warm-border);
+  color: var(--text-muted);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 详情页立绘占位 —— 尺寸与 .detail-avatar 一致 */
+.detail-avatar-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 260px;
+  background: radial-gradient(circle at center 60%, #ffffff 0%, #faf3eb 100%);
+  border: 1px solid var(--warm-border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  letter-spacing: .12em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= 仝娘大测试 ================= */
+
+.quiz-intro {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  background: #fffaf3;
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.quiz-intro b { color: var(--accent-warm); font-weight: 800; }
+
+.quiz-form { display: flex; flex-direction: column; gap: 20px; }
+
+.quiz-question {
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-photo);
+}
+
+.quiz-q-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quiz-q-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: var(--font-xs);
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--accent-warm);
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.quiz-q-index {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.quiz-q-text {
+  font-size: var(--font-md);
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fdf9f4;
+}
+
+.quiz-option:hover {
+  border-color: var(--accent-warm);
+  background: var(--accent-soft);
+}
+
+.quiz-option input { display: none; }
+
+.quiz-option:has(input:checked) {
+  border-color: var(--accent-warm);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 2px rgba(244, 111, 63, 0.15);
+}
+
+.quiz-opt-letter {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.quiz-option:has(input:checked) .quiz-opt-letter {
+  background: var(--accent-warm);
+  color: #ffffff;
+  border-color: var(--accent-warm);
+}
+
+.quiz-opt-text {
+  font-size: var(--font-sm);
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.quiz-actions {
+  margin-top: 24px;
+  text-align: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.quiz-submit-btn {
+  padding: 12px 32px;
+  background: var(--accent-warm);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--font-md);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quiz-submit-btn:hover {
+  background: #e05a2b;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ---------- 结果页 ---------- */
+
+.quiz-result-summary {
+  text-align: center;
+  padding: 30px 24px;
+  background: linear-gradient(135deg, #fffaf3 0%, #fef5f0 100%);
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  margin-bottom: 24px;
+}
+
+.quiz-score-big {
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--accent-warm);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.quiz-score-unit {
+  font-size: 20px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.quiz-score-detail {
+  font-size: var(--font-md);
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.quiz-score-detail b { color: var(--accent-warm); font-weight: 800; }
+
+.quiz-comment {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.quiz-review-list { display: flex; flex-direction: column; gap: 16px; }
+
+.quiz-review-item {
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  padding: 18px 22px;
+  box-shadow: var(--shadow-photo);
+}
+
+.quiz-review-item.is-correct { border-left: 4px solid #4caf50; }
+.quiz-review-item.is-wrong   { border-left: 4px solid #e05a2b; }
+
+.quiz-review-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quiz-q-status {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  font-weight: 800;
+}
+
+.quiz-review-item.is-correct .quiz-q-status { color: #4caf50; }
+.quiz-review-item.is-wrong   .quiz-q-status { color: #e05a2b; }
+
+.quiz-review-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.quiz-review-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-sm);
+  background: #faf6f0;
+  font-size: var(--font-sm);
+  color: var(--text-main);
+}
+
+.quiz-review-option.opt-correct {
+  background: #eaf6ee;
+  border-color: #4caf50;
+  color: #1b6e2f;
+}
+
+.quiz-review-option.opt-chosen-wrong {
+  background: #fdecea;
+  border-color: #e05a2b;
+  color: #a13318;
+}
+
+.quiz-opt-tag {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #4caf50;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.quiz-opt-tag.wrong { background: #e05a2b; }
+
+.quiz-explanation {
+  padding: 10px 14px;
+  background: #fdf9f4;
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--font-xs);
+  line-height: 1.7;
+  color: var(--text-sub);
+}
+
+.quiz-explanation-label {
+  font-weight: 800;
+  color: var(--accent-warm);
+}
+
+.quiz-retry-btn,
+.quiz-back-btn {
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: 800;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.quiz-retry-btn {
+  background: var(--accent-warm);
+  color: #ffffff;
+  border: 1.5px solid var(--accent-warm);
+}
+
+.quiz-retry-btn:hover {
+  background: #e05a2b;
+  transform: translateY(-2px);
+}
+
+.quiz-back-btn {
+  background: #ffffff;
+  color: var(--text-main);
+  border: 1.5px solid var(--warm-border);
+}
+
+.quiz-back-btn:hover {
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+}
+
+/* ================= 大模型预言 ================= */
+
+.prediction-intro {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: #fffaf3;
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.prediction-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.prediction-stat {
+  text-align: center;
+  padding: 16px 10px;
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-photo);
+}
+
+.prediction-stat.is-fulfilled { border-top: 3px solid #4caf50; }
+.prediction-stat.is-pending   { border-top: 3px solid #f9c62b; }
+.prediction-stat.is-failed    { border-top: 3px solid #e05a2b; }
+
+.prediction-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.prediction-stat.is-fulfilled .prediction-stat-num { color: #4caf50; }
+.prediction-stat.is-pending   .prediction-stat-num { color: #d19c00; }
+.prediction-stat.is-failed    .prediction-stat-num { color: #e05a2b; }
+
+.prediction-stat-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-sub);
+  letter-spacing: .08em;
+}
+
+/* tabs */
+.prediction-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.prediction-tab {
+  padding: 7px 16px;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.prediction-tab:hover {
+  color: var(--accent-warm);
+  border-color: var(--accent-warm);
+}
+
+.prediction-tab.active {
+  background: var(--accent-warm);
+  color: #ffffff;
+  border-color: var(--accent-warm);
+}
+
+/* cards */
+.prediction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prediction-card {
+  position: relative;
+  padding: 22px 26px 20px;
+  background: #ffffff;
+  border: 1.5px solid var(--warm-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-photo);
+  transition: all 0.25s ease;
+}
+
+.prediction-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.prediction-card.is-fulfilled { border-left: 4px solid #4caf50; }
+.prediction-card.is-pending   { border-left: 4px solid #f9c62b; }
+.prediction-card.is-failed    { border-left: 4px solid #e05a2b; }
+
+.prediction-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.prediction-id {
+  font-family: "JetBrains Mono", monospace;
+  font-size: var(--font-xs);
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: .04em;
+}
+
+.prediction-status {
+  margin-left: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.prediction-status.fulfilled {
+  background: #eaf6ee;
+  color: #1b6e2f;
+}
+
+.prediction-status.pending {
+  background: #fff8e1;
+  color: #a17b00;
+}
+
+.prediction-status.failed {
+  background: #fdecea;
+  color: #a13318;
+}
+
+.prediction-content {
+  font-size: var(--font-md);
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  quotes: none;
+}
+
+.prediction-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: var(--font-xs);
+  color: var(--text-sub);
+  margin-bottom: 14px;
+}
+
+.prediction-source {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.prediction-confidence {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.prediction-confidence-label {
+  flex-shrink: 0;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: .06em;
+}
+
+.prediction-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #f2e9e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prediction-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.prediction-bar-fill.is-fulfilled { background: linear-gradient(90deg, #6ecf7b, #4caf50); }
+.prediction-bar-fill.is-pending   { background: linear-gradient(90deg, #f9c62b, #e0a800); }
+.prediction-bar-fill.is-failed    { background: linear-gradient(90deg, #ff9558, #e05a2b); }
+
+.prediction-confidence-num {
+  flex-shrink: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: var(--font-xs);
+  font-weight: 800;
+  color: var(--text-main);
+  min-width: 36px;
+  text-align: right;
+}
+
+.prediction-commentary {
+  padding: 12px 16px;
+  background: #fdf9f4;
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--font-xs);
+  line-height: 1.75;
+  color: var(--text-sub);
+  margin-bottom: 12px;
+}
+
+.prediction-commentary-label {
+  font-weight: 800;
+  color: var(--accent-warm);
+  margin-right: 6px;
+  letter-spacing: .06em;
+}
+
+.prediction-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.prediction-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #faf6f0;
+  padding: 2px 8px;
+  border-radius: 5px;
+  letter-spacing: .02em;
+}
+
+@media (max-width: 640px) {
+  .prediction-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .prediction-card {
+    padding: 18px 20px;
+  }
+}
+
+/* ================= 虚拟八角笼 intro ================= */
+
+.battle-intro {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  background: #fffaf3;
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* 预言来源类型小标签 */
+.prediction-type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #faf6f0;
+  border: 1px solid var(--warm-border);
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: .04em;
+  line-height: 1.5;
+}

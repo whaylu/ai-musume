@@ -1,0 +1,101 @@
+{#
+  命运邂逅页面模板。
+  交互概念基于开源项目 Yuzusoft_Guide 修改：
+    https://github.com/TigerFong/Yuzusoft_Guide
+    Copyright (c) TigerFong
+    Licensed under the MIT License
+  原项目 LICENSE 文件已保留在仓库根目录（LICENSE.original）。
+#}
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">DESTINY ENCOUNTER</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">命运邂逅 <span class="en-title">DESTINY ENCOUNTER</span></h2>
+  </div>
+
+  <p class="discover-lead">
+    选中的标签是<strong>加分项</strong>——命中越多排越前。不同维度权重不同：场景 &gt; 价格 &gt; 许可 &gt; 地区。
+  </p>
+
+  {% if selected_tags %}
+    <div class="selected-tags">
+      <span class="selected-label">已选：</span>
+      {% for t in selected_tags %}
+        <span class="selected-chip">{{ t.label }}</span>
+      {% endfor %}
+      <a class="selected-clear" href="{{ url_for('discover') }}">清空</a>
+    </div>
+  {% endif %}
+
+  <div class="discover-groups">
+    {% for group_name, tags in tag_views.items() %}
+      <div class="discover-group">
+        <span class="discover-group-label">{{ group_name }}</span>
+        <div class="discover-tag-list">
+          {% for tag in tags %}
+            <a class="discover-tag {{ 'active' if tag.is_selected }}"
+               href="{{ url_for('discover', tags=tag.next_query) if tag.next_query else url_for('discover') }}">
+              {{ tag.label }}
+              <span class="discover-tag-count">{{ tag.count }}</span>
+              {% if tag.is_selected %}<span class="tag-x">×</span>{% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if selected_tags %}
+    <div class="discover-result-header">
+      <span class="discover-result-count">
+        共 <b>{{ total }}</b> 位仝娘匹配，按相关度排序
+      </span>
+    </div>
+  {% else %}
+    <div class="discover-result-header">
+      <span class="discover-result-count">
+        共 <b>{{ total }}</b> 位仝娘，选几个标签开始筛选
+      </span>
+    </div>
+  {% endif %}
+
+  {% if hits %}
+    <div class="character-grid">
+      {% for hit in hits %}
+        <a class="card discover-card" href="{{ url_for('character_detail', char_id=hit.character.id) }}">
+          <span class="card-code">#{{ hit.character.code }}</span>
+          {% if selected_tags %}
+            <span class="card-score">{{ hit.percent }}%</span>
+          {% endif %}
+          <img class="card-img" src="{{ url_for('static', filename=hit.character.logo_url) }}"
+               alt="{{ hit.character.name }}" draggable="false" loading="lazy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-img-placeholder" style="display:none;">暂无图标</div>
+          <div class="card-title">{{ hit.character.name }}</div>
+          <div class="card-tag">{{ hit.character.title }}</div>          {% if selected_tags and hit.matched_tags %}
+            <div class="discover-hit-meta">
+              {% for t in hit.matched_tags %}
+                <span class="hit-tag">{{ t.label }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-hint" style="padding: 60px 0;">
+      🌸 没有命中任何标签的仝娘。<br>
+      <span style="font-size: 13px; color: var(--text-muted);">试试去掉一两个标签，或者换个组合。</span>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

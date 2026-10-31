@@ -1,25 +1,39 @@
+# ============================================================
+# 命运邂逅模块（DiscoverService / FilterTag / DiscoverHit）
+# 的交互概念基于以下开源项目修改：
+#
+#     Yuzusoft_Guide · https://github.com/TigerFong/Yuzusoft_Guide
+#     Copyright (c) TigerFong
+#     Licensed under the MIT License
+#
+# 原项目 LICENSE 文件已保留在仓库根目录（THIRD_PARTY_LICENSES）。
+# 本站仅对标签维度、筛选机制与数据结构做了重构，未直接复制原项目代码。
+# ============================================================
 """
 仝娘之家 · 通用业务核心库（Core Library）
 ============================================
-v0.6 · 搜索支持 "-" 排除语义：
-    输入 "开源 -国产" → 命中的含"开源"，但不含"国产"
+v0.7 · 新增命运邂逅：按标签筛选角色
 """
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Protocol, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Set, Tuple
 from urllib.parse import urlparse
 import html as _html
+import random
 import time
 
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 __all__ = [
     "DomainError", "NotFound",
     "CharacterVersion", "AiCharacter", "NewsItem", "Term",
-    "Prompt", "PromptScene", "Fighter", "Battle",
+    "Fighter", "Battle",
     "ExternalSite", "AboutItem", "SectionMeta",
     "CharacterService", "NewsService", "TermService",
-    "PromptService", "BattleService",
+    "BattleService", "DiscoverService",
+    "QuizOption", "QuizQuestion", "QuizService",
+    "Prediction", "PredictionService",
+    "FilterTag", "DiscoverHit",
     "WeightedField", "SearchHit", "SearchQuery", "Page",
     "SearchResult", "SearchHistory",
     "Searchable", "SynonymMap", "SearchSource", "SearchService",
@@ -77,20 +91,7 @@ class SearchHit:
 
 
 def parse_query(raw: str) -> Tuple[List[str], List[str]]:
-    """
-    解析查询字符串。
-
-    规则：
-        - 以 "-" 开头的词进入 exclude（排除）
-        - 其余词进入 include（包含）
-        - 单独的 "-" 或 "--" 忽略
-        - 全角空格和半角空格都兼容
-
-    例：
-        "开源 -国产"        -> (["开源"], ["国产"])
-        "GPT -2023 -闭源"   -> (["GPT"], ["2023", "闭源"])
-        "GPT-4"            -> (["GPT-4"], [])   # "-" 不在开头，不解析为排除
-    """
+    """解析 "-" 排除语义。"""
     if not raw:
         return [], []
     tokens = raw.replace("\u3000", " ").split()
@@ -107,7 +108,6 @@ def parse_query(raw: str) -> Tuple[List[str], List[str]]:
 
 
 def split_keywords(raw: str) -> List[str]:
-    """纯分词，不做 include/exclude 分类。保留给老代码兼容。"""
     if not raw:
         return []
     return [k for k in raw.replace("\u3000", " ").split() if k]
@@ -115,7 +115,6 @@ def split_keywords(raw: str) -> List[str]:
 
 @dataclass
 class SearchQuery:
-    """结构化查询对象：包含词 + 排除词 + 类型过滤 + 分页。"""
     raw: str
     include: List[str] = field(default_factory=list)
     exclude: List[str] = field(default_factory=list)
@@ -133,7 +132,6 @@ class SearchQuery:
 
     @property
     def is_empty(self) -> bool:
-        # 只有排除词、没有正向词：视为空查询（避免"搜全部再排除"的歧义）
         return not self.include
 
     @property
@@ -162,14 +160,6 @@ class Page:
     def has_next(self) -> bool:
         return self.page < self.total_pages
 
-    @property
-    def prev_page(self) -> int:
-        return max(1, self.page - 1)
-
-    @property
-    def next_page(self) -> int:
-        return min(self.total_pages, self.page + 1)
-
 
 @dataclass
 class SearchResult:
@@ -183,13 +173,6 @@ class SearchResult:
     @property
     def is_empty(self) -> bool:
         return self.total == 0
-
-    def flat_hits(self, order: Optional[List[str]] = None) -> List[SearchHit]:
-        keys = order or list(self.grouped.keys())
-        out: List[SearchHit] = []
-        for k in keys:
-            out.extend(self.grouped.get(k, []))
-        return out
 
 
 class Searchable(Protocol):
@@ -244,16 +227,9 @@ def score_object(
     keyword_groups: List[List[str]],
     exclude_groups: Optional[List[List[str]]] = None,
 ) -> Optional[SearchHit]:
-    """
-    通用打分函数。
-
-    先做排除检查：任意一个排除词组命中任意字段，直接出局（返回 None）。
-    再做包含检查：每个包含词组必须至少命中一个字段（AND 语义）。
-    """
     if not keyword_groups:
         return None
 
-    # ---- 1. 排除检查 ----
     if exclude_groups:
         for group in exclude_groups:
             for f in fields:
@@ -265,7 +241,6 @@ def score_object(
                     if kl and kl in text:
                         return None
 
-    # ---- 2. 包含打分 ----
     matched_fields: List[str] = []
     matched_keywords: List[str] = []
     total = 0
@@ -505,6 +480,303 @@ class SearchHistory:
 
 
 # ============================================================
+# 命运邂逅：分制推荐
+# ============================================================
+GROUP_WEIGHTS = {
+    "许可": 1.0,
+    "地区": 0.8,
+    "价格": 1.2,
+    "场景": 1.5,
+}
+
+
+@dataclass
+class FilterTag:
+    """筛选标签。值对象。"""
+    key: str
+    label: str
+    group: str
+    count: int = 0
+
+
+@dataclass
+class DiscoverHit:
+    """命运邂逅的一条推荐结果。值对象。"""
+    character: "AiCharacter"
+    score: float
+    max_score: float
+    matched_tags: List["FilterTag"] = field(default_factory=list)
+
+    @property
+    def percent(self) -> int:
+        if self.max_score <= 0:
+            return 0
+        return round(self.score / self.max_score * 100)
+
+    @property
+    def matched_count(self) -> int:
+        return len(self.matched_tags)
+
+
+class DiscoverService:
+    """
+    命运邂逅服务：分制推荐。
+
+    - 每个选中标签有基础分 10，乘以所属维度的权重
+    - 角色每命中一个标签，累加对应分数
+    - 一个标签都没命中的角色不出现
+    - 按总分降序，同分按名字字母序
+
+    标签从角色的现有字段自动派生——main_tags 决定许可，
+    nationality 决定地区，versions 的 price 决定价格档，
+    stats 决定场景能力。新增角色时无需手动维护标签映射。
+    """
+
+    def __init__(self, characters: List["AiCharacter"]):
+        self._characters = characters
+        self._tag_defs = self._build_tag_defs()
+        self._char_tags: Dict[str, Set[str]] = {
+            c.id: self._derive_tags(c) for c in characters
+        }
+
+    def _build_tag_defs(self) -> List[FilterTag]:
+        return [
+            FilterTag("open-source",   "开源",       "许可"),
+            FilterTag("closed-source", "闭源",       "许可"),
+            FilterTag("china",         "国产",       "地区"),
+            FilterTag("overseas",      "海外",       "地区"),
+            FilterTag("free",          "免费可用",   "价格"),
+            FilterTag("low-cost",      "低价 API",   "价格"),
+            FilterTag("subscription",  "订阅制",     "价格"),
+            FilterTag("coding",        "擅长编程",   "场景"),
+            FilterTag("writing",       "中文写作",   "场景"),
+            FilterTag("long-text",     "超长上下文", "场景"),
+            FilterTag("multimodal",    "多模态",     "场景"),
+            FilterTag("reasoning",     "深度推理",   "场景"),
+        ]
+
+    def _derive_tags(self, char: "AiCharacter") -> Set[str]:
+        tags: Set[str] = set()
+        mt = " ".join(char.main_tags)
+        prices = " ".join(v.price for v in char.versions)
+
+        if "开源" in mt: tags.add("open-source")
+        if "闭源" in mt: tags.add("closed-source")
+
+        if char.nationality == "中国": tags.add("china")
+        elif char.nationality: tags.add("overseas")
+
+        if "免费" in prices: tags.add("free")
+        if "低价" in prices or "极低" in prices: tags.add("low-cost")
+        if "订阅" in prices: tags.add("subscription")
+
+        if char.stats.get("代码构建", 0) >= 90: tags.add("coding")
+        if char.stats.get("中文理解", 0) >= 95: tags.add("writing")
+        if char.stats.get("长文本处理", 0) >= 95: tags.add("long-text")
+        if char.stats.get("多模态", 0) >= 90: tags.add("multimodal")
+        if char.stats.get("逻辑推理", 0) >= 95: tags.add("reasoning")
+
+        return tags
+
+    def all_tags_grouped(self) -> Dict[str, List[FilterTag]]:
+        """
+        按维度分组返回全部标签，带匹配数。
+
+        分组顺序按 GROUP_WEIGHTS 降序（场景 > 价格 > 许可 > 地区），
+        组内按匹配数降序，让最可能被点的标签排前面。
+        """
+        raw: Dict[str, List[FilterTag]] = {}
+        for tag in self._tag_defs:
+            count = sum(1 for tags in self._char_tags.values() if tag.key in tags)
+            if count == 0:
+                continue
+            raw.setdefault(tag.group, []).append(
+                FilterTag(tag.key, tag.label, tag.group, count)
+            )
+
+        ordered: Dict[str, List[FilterTag]] = {}
+        for group in sorted(raw.keys(), key=lambda g: -GROUP_WEIGHTS.get(g, 1.0)):
+            ordered[group] = sorted(raw[group], key=lambda t: (-t.count, t.label))
+        return ordered
+
+    def rank(self, selected_keys: List[str]) -> List[DiscoverHit]:
+        """按分制排序。没选标签时返回全部角色（分数为 0）。"""
+        if not selected_keys:
+            return [DiscoverHit(c, 0.0, 0.0) for c in self._characters]
+
+        by_key = {t.key: t for t in self._tag_defs}
+        selected = [by_key[k] for k in selected_keys if k in by_key]
+        if not selected:
+            return [DiscoverHit(c, 0.0, 0.0) for c in self._characters]
+
+        max_score = sum(10.0 * GROUP_WEIGHTS.get(t.group, 1.0) for t in selected)
+
+        hits: List[DiscoverHit] = []
+        for c in self._characters:
+            char_tags = self._char_tags[c.id]
+            matched = [t for t in selected if t.key in char_tags]
+            if not matched:
+                continue
+            score = sum(10.0 * GROUP_WEIGHTS.get(t.group, 1.0) for t in matched)
+            hits.append(DiscoverHit(c, score, max_score, matched))
+
+        hits.sort(key=lambda h: (-h.score, h.character.name))
+        return hits
+
+    def tag_labels(self, keys: List[str]) -> List[FilterTag]:
+        by_key = {t.key: t for t in self._tag_defs}
+        return [by_key[k] for k in keys if k in by_key]
+
+# ============================================================
+# 仝娘大测试
+# ============================================================
+@dataclass
+class QuizOption:
+    """测试题的一个选项。"""
+    text: str
+    is_correct: bool = False
+
+
+@dataclass
+class QuizQuestion:
+    """一道测试题：题干 + 4 个选项 + 正确答案解释。"""
+    id: int
+    question: str
+    options: List[QuizOption]
+    explanation: str = ""
+
+    def correct_index(self) -> int:
+        for i, o in enumerate(self.options):
+            if o.is_correct:
+                return i
+        return -1
+
+
+class QuizService:
+    """
+    仝娘大测试服务。
+
+    - `all()`：拿全部题目
+    - `draw(n)`：从题库随机抽 n 题
+    - `by_ids(ids)`：按 id 列表还原题目（判分时用）
+    - `grade(questions, answers)`：对指定题目判分
+    """
+
+    def __init__(self, questions: List[QuizQuestion]):
+        self._questions = questions
+        self._by_id = {q.id: q for q in questions}
+
+    def all(self) -> List[QuizQuestion]:
+        return self._questions
+
+    def total(self) -> int:
+        return len(self._questions)
+
+    def draw(self, n: int = 10) -> List[QuizQuestion]:
+        """随机抽 n 题，n 大于题库时返回全部。"""
+        n = min(n, len(self._questions))
+        return random.sample(self._questions, n)
+
+    def by_ids(self, ids: List[int]) -> List[QuizQuestion]:
+        """按 id 列表还原题目，保持传入顺序。"""
+        return [self._by_id[i] for i in ids if i in self._by_id]
+
+    def grade(
+        self,
+        questions: List[QuizQuestion],
+        answers: Dict[int, int],
+    ) -> Dict[str, Any]:
+        if not questions:
+            return {"total": 0, "correct": 0, "score": 0,
+                    "results": [], "comment": "没有题目"}
+
+        results = []
+        correct = 0
+        for q in questions:
+            chosen = answers.get(q.id, -1)
+            ci = q.correct_index()
+            ok = (chosen == ci)
+            if ok:
+                correct += 1
+            results.append({
+                "question": q,
+                "chosen": chosen,
+                "correct_index": ci,
+                "is_correct": ok,
+            })
+
+        score = round(correct / len(questions) * 100)
+
+        if score == 100:
+            comment = "满分！你是 AI 圈真·大佬。"
+        elif score >= 75:
+            comment = "很棒，你对 AI 的理解已经很到位了。"
+        elif score >= 50:
+            comment = "及格线，基础还在，还能再补补。"
+        elif score >= 25:
+            comment = "还需努力，去「大白话术语」补补课吧。"
+        else:
+            comment = "来都来了，先去看看术语页再回来。"
+
+        return {
+            "total": len(questions),
+            "correct": correct,
+            "score": score,
+            "results": results,
+            "comment": comment,
+        }
+
+# ============================================================
+# 大模型预言
+# ============================================================
+@dataclass
+class Prediction:
+    """
+    一条关于 AI 未来的预言。
+
+    status 三态：
+        fulfilled —— 已应验
+        pending   —— 待观察
+        failed    —— 已打脸
+    """
+    id: int
+    content: str
+    source: str
+    source_type: str          # 公司 / 人物 / 模型
+    year: str                 # 预言时间
+    target_year: str          # 预言目标年份
+    confidence: int           # 可信度 0-100
+    status: str
+    commentary: str = ""
+    tags: List[str] = field(default_factory=list)
+
+    @property
+    def status_label(self) -> str:
+        return {"fulfilled": "已应验", "pending": "待观察", "failed": "已打脸"}.get(self.status, self.status)
+
+
+class PredictionService:
+    """大模型预言服务。"""
+
+    def __init__(self, predictions: List[Prediction]):
+        self._predictions = predictions
+
+    def all(self) -> List[Prediction]:
+        return self._predictions
+
+    def by_status(self, status: str) -> List[Prediction]:
+        return [p for p in self._predictions if p.status == status]
+
+    def stats(self) -> Dict[str, int]:
+        total = len(self._predictions)
+        return {
+            "total": total,
+            "fulfilled": sum(1 for p in self._predictions if p.status == "fulfilled"),
+            "pending": sum(1 for p in self._predictions if p.status == "pending"),
+            "failed": sum(1 for p in self._predictions if p.status == "failed"),
+        }
+
+# ============================================================
 # 领域模型
 # ============================================================
 @dataclass
@@ -566,7 +838,6 @@ class AiCharacter:
 
 @dataclass
 class NewsItem:
-    id: int
     img: str
     date: str
     title: str
@@ -609,25 +880,6 @@ class Term:
         if not keyword:
             return True
         return score_object(self.search_type, self, self.search_fields(), [[keyword]]) is not None
-
-
-@dataclass
-class Prompt:
-    scene: str
-    name: str
-    when: str
-    prompt: str
-    tips: str
-
-
-@dataclass
-class PromptScene:
-    key: str
-    title: str
-    code: str
-    img: str
-    desc: str
-    prompts: List[Prompt] = field(default_factory=list)
 
 
 @dataclass
@@ -743,18 +995,6 @@ class TermService:
 
     def search(self, keyword: str) -> List[Term]:
         return [t for t in self.all_terms() if t.matches(keyword)]
-
-
-class PromptService:
-    def __init__(self, scenes: List[PromptScene]):
-        self._scenes = scenes
-        self._by_key = {s.key: s for s in scenes}
-
-    def all_scenes(self) -> List[PromptScene]:
-        return self._scenes
-
-    def get(self, key: str) -> Optional[PromptScene]:
-        return self._by_key.get(key)
 
 
 class BattleService:

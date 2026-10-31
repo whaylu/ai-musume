@@ -12,15 +12,184 @@
     <h2 class="titles">{{ meta.title }} <span class="en-title">{{ meta.code }}</span></h2>
   </div>
 
-  {% if battles %}
-    <div class="battle-card-list">
-      {% for b in battles %}
+  {# ============ 仝娘大测试 ============ #}
+  {% if meta.key == "quiz" and quiz_questions %}
+
+    {% if quiz_result %}
+      <div class="quiz-result-summary">
+        <div class="quiz-score-big">{{ quiz_result.score }}<span class="quiz-score-unit">分</span></div>
+        <div class="quiz-score-detail">
+          答对 <b>{{ quiz_result.correct }}</b> / {{ quiz_result.total }} 题
+        </div>
+        <div class="quiz-comment">{{ quiz_result.comment }}</div>
+      </div>
+
+      <div class="quiz-review-list">
+        {% for r in quiz_result.results %}
+          <div class="quiz-review-item {{ 'is-correct' if r.is_correct else 'is-wrong' }}">
+            <div class="quiz-review-head">
+              <span class="quiz-q-num">Q{{ r.question.id }}</span>
+              <span class="quiz-q-status">
+                {% if r.is_correct %}✓ 答对{% else %}✗ 答错{% endif %}
+              </span>
+            </div>
+            <p class="quiz-q-text">{{ r.question.question }}</p>
+
+            <div class="quiz-review-options">
+              {% for opt in r.question.options %}
+                {% set idx = loop.index0 %}
+                <div class="quiz-review-option
+                            {{ 'opt-correct' if idx == r.correct_index }}
+                            {{ 'opt-chosen-wrong' if (idx == r.chosen and not r.is_correct) }}
+                            {{ 'opt-chosen-right' if (idx == r.chosen and r.is_correct) }}">
+                  <span class="quiz-opt-letter">{{ "ABCD"[idx] }}</span>
+                  <span class="quiz-opt-text">{{ opt.text }}</span>
+                  {% if idx == r.correct_index %}
+                    <span class="quiz-opt-tag">正确答案</span>
+                  {% endif %}
+                  {% if idx == r.chosen and not r.is_correct %}
+                    <span class="quiz-opt-tag wrong">你选的</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="quiz-explanation">
+              <span class="quiz-explanation-label">解析：</span>{{ r.question.explanation }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="quiz-actions">
+        <a class="quiz-retry-btn" href="{{ url_for('section_quiz') }}">再测一次</a>
+        <a class="quiz-back-btn" href="{{ url_for('home') }}">回首页</a>
+      </div>
+
+    {% else %}
+      <div class="quiz-intro">
+        <p>共 <b>{{ quiz_questions|length }}</b> 道题，从 25 题题库里随机抽取。</p>
+        <p>答完提交，立刻出分，还会告诉你每道题为什么。</p>
+      </div>
+
+      <form method="post" action="{{ url_for('section_quiz') }}" class="quiz-form">
+        <input type="hidden" name="question_ids"
+               value="{% for q in quiz_questions %}{{ q.id }}{% if not loop.last %},{% endif %}{% endfor %}">
+        {% for q in quiz_questions %}
+          <div class="quiz-question">
+            <div class="quiz-q-head">
+              <span class="quiz-q-num">Q{{ q.id }}</span>
+              <span class="quiz-q-index">{{ loop.index }} / {{ quiz_questions|length }}</span>
+            </div>
+            <p class="quiz-q-text">{{ q.question }}</p>
+            <div class="quiz-options">
+              {% for opt in q.options %}
+                <label class="quiz-option">
+                  <input type="radio" name="q{{ q.id }}" value="{{ loop.index0 }}">
+                  <span class="quiz-opt-letter">{{ "ABCD"[loop.index0] }}</span>
+                  <span class="quiz-opt-text">{{ opt.text }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="quiz-actions">
+          <button type="submit" class="quiz-submit-btn">提交，看成绩 →</button>
+        </div>
+      </form>
+    {% endif %}
+
+  {# ============ 大模型预言 ============ #}
+  {% elif predictions %}
+
+    <div class="prediction-intro">
+      <p>这一页收集了 AI 圈几年内的重要预言——有的已经应验，有的还在等待，有的已经被现实打脸。</p>
+      <p>翻一翻，看看 AI 圈的人有多敢说。</p>
+    </div>
+
+    {% if prediction_stats %}
+      <div class="prediction-stats">
+        <div class="prediction-stat">
+          <span class="prediction-stat-num">{{ prediction_stats.total }}</span>
+          <span class="prediction-stat-label">总预言</span>
+        </div>
+        <div class="prediction-stat is-fulfilled">
+          <span class="prediction-stat-num">{{ prediction_stats.fulfilled }}</span>
+          <span class="prediction-stat-label">已应验</span>
+        </div>
+        <div class="prediction-stat is-pending">
+          <span class="prediction-stat-num">{{ prediction_stats.pending }}</span>
+          <span class="prediction-stat-label">待观察</span>
+        </div>
+        <div class="prediction-stat is-failed">
+          <span class="prediction-stat-num">{{ prediction_stats.failed }}</span>
+          <span class="prediction-stat-label">已打脸</span>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="prediction-tabs">
+      <button type="button" class="prediction-tab active" data-status="all">全部</button>
+      <button type="button" class="prediction-tab" data-status="fulfilled">已应验</button>
+      <button type="button" class="prediction-tab" data-status="pending">待观察</button>
+      <button type="button" class="prediction-tab" data-status="failed">已打脸</button>
+    </div>
+
+    <div class="prediction-list" id="prediction-list">
+      {% for p in predictions %}
+        <div class="prediction-card is-{{ p.status }}" data-status="{{ p.status }}">
+          <div class="prediction-head">
+            <span class="prediction-id">#{{ "%02d"|format(p.id) }}</span>
+            <span class="prediction-status {{ p.status }}">{{ p.status_label }}</span>
+          </div>
+
+          <p class="prediction-content">“{{ p.content }}”</p>
+
+          <div class="prediction-meta">
+            <span class="prediction-source">{{ p.source }}</span>
+            <span class="prediction-type">{{ p.source_type }}</span>
+            <span class="prediction-time">{{ p.year }} 年提出 · 预言 {{ p.target_year }} 年前实现</span>
+          </div>
+          
+          <div class="prediction-confidence">
+            <span class="prediction-confidence-label">提出者可信度</span>
+            <div class="prediction-bar-bg">
+              <div class="prediction-bar-fill is-{{ p.status }}" data-confidence="{{ p.confidence }}"></div>
+            </div>
+            <span class="prediction-confidence-num">{{ p.confidence }}%</span>
+          </div>
+
+          {% if p.commentary %}
+            <div class="prediction-commentary">
+              <span class="prediction-commentary-label">点评</span>
+              {{ p.commentary }}
+            </div>
+          {% endif %}
+
+          {% if p.tags %}
+            <div class="prediction-tags">
+              {% for t in p.tags %}
+                <span class="prediction-tag">#{{ t }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {# ============ 虚拟八角笼 ============ #}
+  {% elif battles %}
+    <div class="battle-intro">
+      <p>两个模型，同一个问题，一位裁判。</p>
+      <p>谁更懂人话，谁就是这场八角笼的赢家——这不是真实评测，是“如果它们真打起来会怎样”的想象。</p>
+    </div>
+    <div class="battle-card-list">      {% for b in battles %}
         <div class="battle-card">
           <div class="battle-header">
             <span class="battle-num">#0{{ b.id }}</span>
             <h3 class="battle-question">{{ b.question }}</h3>
           </div>
-
           <div class="battle-arena">
             <div class="fighter-col {{ 'is-winner' if b.a_wins }}">
               <div class="fighter-meta">
@@ -31,8 +200,7 @@
               </div>
               <p class="fighter-text">{{ b.fighter_a.response }}</p>
             </div>
-
-            <div class="fighter-col {{ 'is-winner' if b.b_wins }}">
+            <div class="fighter-col {{ 'is-b-wins' if b.b_wins }}">
               <div class="fighter-meta">
                 <img class="fighter-logo" src="{{ url_for('static', filename='imgs/' + b.fighter_b.id + 'logo.png') }}"
                      onerror="this.style.display='none'">
@@ -42,7 +210,6 @@
               <p class="fighter-text">{{ b.fighter_b.response }}</p>
             </div>
           </div>
-
           <div class="battle-verdict">
             <span class="verdict-label">裁决：</span>
             <span>{{ b.commentary }}</span>
@@ -50,11 +217,37 @@
         </div>
       {% endfor %}
     </div>
+
+  {# ============ 其他栏目（占位） ============ #}
   {% else %}
     <div class="empty-hint" style="padding: 60px 0; font-size: 16px;">
       🚧 【{{ meta.title }}】栏目正在筹备更新中，敬请期待！
     </div>
   {% endif %}
+
 </div>
+
+<script>
+(function () {
+  document.querySelectorAll('.prediction-bar-fill[data-confidence]').forEach(bar => {
+    bar.style.width = `${bar.dataset.confidence}%`;
+  });
+
+  const tabs = document.querySelectorAll('.prediction-tab');
+  const cards = document.querySelectorAll('.prediction-card');
+  if (!tabs.length || !cards.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const status = tab.dataset.status;
+      tabs.forEach(t => t.classList.toggle('active', t === tab));
+      cards.forEach(c => {
+        const show = (status === 'all') || (c.dataset.status === status);
+        c.style.display = show ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
 
 {% endblock %}

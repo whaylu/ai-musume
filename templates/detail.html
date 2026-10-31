@@ -10,7 +10,9 @@
   <aside class="detail-left-panel">
     <div class="detail-polaroid">
       <img class="detail-avatar" src="{{ url_for('static', filename=char.char_url) }}"
-           alt="{{ char.name }}" draggable="false">
+           alt="{{ char.name }}" draggable="false"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="detail-avatar-placeholder" style="display:none;">暂无立绘</div>
 
       <div class="left-header">
         <h1 class="left-name">{{ char.name }}</h1>

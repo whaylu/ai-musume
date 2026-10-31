@@ -53,6 +53,28 @@
   </div>
 </section>
 
+{# ===================== 命运邂逅 ===================== #}
+<section class="section" id="discover-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">命运邂逅 <span class="en-title">DESTINY ENCOUNTER</span></h2>
+  </div>
+
+  <div class="discover-quick-grid">
+    {% for tag in discover_quick_tags %}
+      <a class="discover-quick-card" href="{{ url_for('discover', tags=tag.key) }}">
+        <span class="discover-quick-label">{{ tag.label }}</span>
+        <span class="discover-quick-count">{{ tag.count }} 位</span>
+      </a>
+    {% endfor %}
+
+    <a class="discover-quick-card discover-quick-more" href="{{ url_for('discover') }}">
+      <span class="discover-quick-label">更多筛选</span>
+      <span class="discover-quick-arrow">→</span>
+    </a>
+  </div>
+</section>
+
 {# ===================== 大白话术语入口 ===================== #}
 <section class="section" id="translate-section">
   <div class="section-title-wrapper">
@@ -102,11 +124,11 @@
         <p class="card-subtitle glow">2067年，仝娘将称霸世界？！</p>
       </div>
     </a>
-    <a class="simple-card" href="{{ url_for('section', key='moments') }}"
-       style="--bg-img: url('{{ url_for('static', filename='imgs/group003.png') }}');">
+    <a class="simple-card" href="{{ url_for('section_quiz') }}"
+      style="--bg-img: url('{{ url_for('static', filename='imgs/group003.png') }}');">
       <div class="card-content">
-        <h3 class="card-title glow">仝娘朋友圈</h3>
-        <p class="card-subtitle glow">用户又在胡说八道了……</p>
+        <h3 class="card-title glow">仝娘大测试</h3>
+        <p class="card-subtitle glow">考考你对 AI 的理解，敢不敢来？</p>
       </div>
     </a>
     <a class="simple-card" href="{{ url_for('section', key='catchphrase') }}"
