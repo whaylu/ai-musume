@@ -131,13 +131,42 @@
         <p class="card-subtitle glow">考考你对 AI 的理解，敢不敢来？</p>
       </div>
     </a>
-    <a class="simple-card" href="{{ url_for('section', key='catchphrase') }}"
-       style="--bg-img: url('{{ url_for('static', filename='imgs/group001.png') }}');">
+    <a class="simple-card" href="{{ url_for('chat') }}"
+       style="--bg-img: url('{{ url_for('static', filename='imgs/glmbg.png') }}');">
       <div class="card-content">
-        <h3 class="card-title glow">口头禅收录</h3>
-        <p class="card-subtitle glow">什么叫做……“AI味”？</p>
+        <h3 class="card-title glow">GLM 聊天室</h3>
+        <p class="card-subtitle glow">和 GLM 一起探索 AI 的无限可能</p>
       </div>
     </a>
+  </div>
+</section>
+
+{# ===================== 新手教程 ===================== #}
+<section class="section" id="tutorials-section">
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">新手教程 <span class="en-title">BEGINNER TUTORIALS</span></h2>
+  </div>
+
+  <div class="tutorial-grid">
+    {% for t in tutorials %}
+      <a class="tutorial-card" href="{{ url_for('tutorial_detail', tutorial_id=t.id) }}">
+        <div class="tutorial-head">
+          <span class="tutorial-level {{ 'is-advanced' if t.level == '进阶' }}">{{ t.level }}</span>
+          <span class="tutorial-duration">{{ t.duration }}</span>
+        </div>
+        <h3 class="tutorial-title">{{ t.title }}</h3>
+        <p class="tutorial-sub">{{ t.subtitle }}</p>
+        <div class="tutorial-foot">
+          <span class="tutorial-steps">{{ t.step_count }} 步</span>
+          <span class="tutorial-arrow">→</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="tutorial-more">
+    <a href="{{ url_for('tutorials') }}">查看全部教程 →</a>
   </div>
 </section>
 

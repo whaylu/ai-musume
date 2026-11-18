@@ -8,20 +8,28 @@
 # 开源项目 LICENSE 文件已保留在仓库根目录（THIRD_PARTY_LICENSES）。
 # ============================================================
 """仝娘之家 · Flask 入口（很薄，只做转接）"""
+import os
 from datetime import date
+from typing import Optional
 
-from flask import Flask, render_template, abort, request, jsonify, redirect, url_for
+from flask import Flask, render_template, abort, request, jsonify, redirect, url_for, session
+
+from core_chat import ChatService, ChatMessage, persona_from_character
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from core import (
     CharacterService, NewsService, TermService,
     BattleService, SearchService, Suggester, SynonymMap, SearchHistory,
     SearchSource, DiscoverService, QuizService, PredictionService,
+    TutorialService,
     NotFound,
 )
 from data import (
     CHARACTERS, NEWS, TERMS, TERM_META, BATTLES,
     EXTERNAL_SITES, ABOUT_ITEMS, SECTIONS,
-    QUIZ_QUESTIONS, PREDICTIONS,
+    QUIZ_QUESTIONS, PREDICTIONS, TUTORIALS,
 )
 
 START_DATE = date(2026, 9, 8)
@@ -63,7 +71,7 @@ def _build_tag_views(tags_grouped, selected_keys):
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    app.secret_key = "ai-musume-dev-key"
+    app.secret_key = os.environ.get("SECRET_KEY", "ai-musume-dev-key")
 
     char_service = CharacterService(CHARACTERS)
     news_service = NewsService(NEWS)
@@ -72,6 +80,7 @@ def create_app() -> Flask:
     discover_service = DiscoverService(CHARACTERS)
     quiz_service = QuizService(QUIZ_QUESTIONS)
     prediction_service = PredictionService(PREDICTIONS)
+    tutorial_service = TutorialService(TUTORIALS)
 
     search_service = SearchService.from_services(
         char_service, news_service, term_service, synonyms=SYNONYMS,
@@ -103,6 +112,7 @@ def create_app() -> Flask:
             characters=char_service.featured(4),
             news=news_service.latest(3),
             term_meta=term_service.levels(),
+            tutorials=tutorial_service.featured(3),
             sections=[SECTIONS[k] for k in ("octagon", "prediction", "quiz", "catchphrase")],
             external_sites=EXTERNAL_SITES,
             discover_quick_tags=quick_tags,
@@ -300,6 +310,91 @@ def create_app() -> Flask:
             predictions=predictions,
             prediction_stats=prediction_stats,
         )
+
+    # ---------- 新手教程 ----------
+    @app.route("/tutorials")
+    def tutorials():
+        return render_template(
+            "tutorials.html",
+            nav=None,
+            tutorials=tutorial_service.all(),
+            total=tutorial_service.count(),
+        )
+
+    @app.route("/tutorials/<tutorial_id>")
+    def tutorial_detail(tutorial_id):
+        tutorial = tutorial_service.get(tutorial_id)
+        if not tutorial:
+            abort(404)
+        others = [t for t in tutorial_service.all() if t.id != tutorial_id][:3]
+        return render_template(
+            "tutorial_detail.html",
+            nav=None,
+            tutorial=tutorial,
+            others=others,
+        )
+
+    # ---------- GLM聊天室 ----------
+    # 聊天服务：密钥从环境变量 ZAI_API_KEY 读，没配也不会让站点崩
+    chat_service = ChatService()
+
+    # 固定人设：全站只跟 GLM 聊，不再选角色
+    GLM_PERSONA = (
+        "你是「仝娘之家」站的专属 AI 助手 GLM，由智谱 GLM 大模型驱动。"
+        "你熟悉各类 AI 模型（DeepSeek、ChatGPT、通义千问等）的科普知识，"
+        "回答亲切、简洁、有趣，每次控制在 150 字以内；"
+        "遇到知识性问题要准确，不要编造不存在的事实。"
+    )
+
+    @app.route("/chat")
+    def chat():
+        return render_template(
+            "chat.html",
+            nav=None,
+            chat_available=chat_service.config.available,
+            model=chat_service.config.model,
+        )
+
+    @app.route("/api/chat", methods=["POST"])
+    def api_chat():
+        if not chat_service.config.available:
+            return jsonify({"error": "GLM聊天室尚未配置，请联系管理员。"}), 503
+
+        body = request.get_json(silent=True) or {}
+        user_text = (body.get("message") or "").strip()
+        if not user_text:
+            return jsonify({"error": "说点什么吧～"}), 400
+        if len(user_text) > 500:
+            return jsonify({"error": "一次别超过 500 字哦。"}), 400
+
+        # 极简按 IP 限流：每分钟最多 8 条，防刷免费额度
+        minute_key = f"chat_rl_{request.remote_addr}_{date.today().toordinal()}"
+        bucket = session.get(minute_key, {"n": 0})
+        if bucket["n"] >= 8:
+            return jsonify({"error": "聊得太快啦，稍等一分钟再试～"}), 429
+
+        # 对话历史存在 session 里（每人一份，天然隔离）
+        hist = [ChatMessage(**m) for m in session.get("chat_history", [])]
+
+        try:
+            reply = chat_service.reply(GLM_PERSONA, hist, user_text)
+        except Exception as e:  # 上游超时/限流/未配置等
+            return jsonify({"error": f"开小差了：{e}"}), 502
+
+        # 追加本轮并写回 session
+        hist.append(ChatMessage("user", user_text))
+        hist.append(ChatMessage("assistant", reply))
+        session["chat_history"] = [m.to_dict() for m in hist[-20:]]
+        session[minute_key] = {"n": bucket["n"] + 1}
+        session.modified = True
+
+        return jsonify({"reply": reply})
+
+    @app.route("/api/chat/clear", methods=["POST"])
+    def api_chat_clear():
+        session.pop("chat_history", None)
+        session.modified = True
+        return jsonify({"ok": True})
 
     # ---------- 关于 ----------
     @app.route("/about")

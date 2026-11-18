@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">GLM CHATROOM</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">GLM 聊天室 <span class="en-title">CHAT WITH GLM</span></h2>
+  </div>
+
+  <p class="discover-lead">
+    和本站专属 AI 助手 GLM 直接聊两句 ——
+    当前模型 <b>{{ model }}</b>，免费体验 · 每人有频率限制。
+  </p>
+
+  {% if not chat_available %}
+    <div class="empty-hint" style="padding:40px 0;">
+      🔑 GLM聊天室尚未配置。<br>
+      <span style="font-size:13px;color:var(--text-muted);">
+        在服务器环境变量里设置 <code>ZAI_API_KEY</code> 后即可开启。
+      </span>
+    </div>
+  {% endif %}
+
+  {# ---- 对话区：社交 App 式气泡 ---- #}
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-log" id="chat-log">
+      <div class="chat-bubble chat-bubble-ai">
+        <img class="chat-avatar" src="{{ url_for('static', filename='imgs/glmpfp.png') }}" alt="GLM">
+        <div class="chat-bubble-body">你好呀，我是 GLM，随便问我点什么～</div>
+      </div>
+    </div>
+
+    <form class="chat-input-row" id="chat-form" autocomplete="off">
+      <input id="chat-input" type="text" maxlength="500"
+             placeholder="输入你的问题……"
+             {% if not chat_available %}disabled{% endif %}>
+      <button type="submit" class="quiz-submit-btn" {% if not chat_available %}disabled{% endif %}>发送</button>
+      <button type="button" class="quiz-back-btn" id="chat-clear">清空对话</button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function () {
+  var log = document.getElementById('chat-log');
+  var form = document.getElementById('chat-form');
+  var input = document.getElementById('chat-input');
+  var clearBtn = document.getElementById('chat-clear');
+  if (!form) return;
+
+  function scrollBottom() { log.scrollTop = log.scrollHeight; }
+
+  // 用户气泡：靠右
+  function userBubble(text) {
+    var d = document.createElement('div');
+    d.className = 'chat-bubble chat-bubble-user';
+    d.innerHTML = '<div class="chat-bubble-body"></div>';
+    d.firstChild.textContent = text;
+    log.appendChild(d);
+    scrollBottom();
+  }
+
+  // GLM 气泡：靠左，带头像
+  function aiBubble(text, isTyping) {
+    var d = document.createElement('div');
+    d.className = 'chat-bubble chat-bubble-ai';
+    var body = document.createElement('div');
+    body.className = 'chat-bubble-body';
+    if (isTyping) body.classList.add('is-typing');
+    body.textContent = text;
+    d.innerHTML = '<img class="chat-avatar" src="{{ url_for("static", filename="imgs/glmpfp.png") }}" alt="GLM">';
+    d.appendChild(body);
+    log.appendChild(d);
+    scrollBottom();
+    return d;
+  }
+
+  // 系统提示：居中灰字
+  function sysBubble(text) {
+    var d = document.createElement('div');
+    d.className = 'chat-sys';
+    d.textContent = text;
+    log.appendChild(d);
+    scrollBottom();
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    userBubble(text);
+    var typing = aiBubble('思考中…', true);
+    try {
+      var res = await fetch('{{ url_for("api_chat") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      var data = await res.json();
+      typing.remove();
+      if (res.ok && data.reply) {
+        aiBubble(data.reply, false);
+      } else {
+        sysBubble(data.error || '出错了，稍后再试～');
+      }
+    } catch (err) {
+      typing.remove();
+      sysBubble('网络开小差了，稍后再试～');
+    }
+  });
+
+  clearBtn.addEventListener('click', async function () {
+    await fetch('{{ url_for("api_chat_clear") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    log.innerHTML =
+      '<div class="chat-bubble chat-bubble-ai">' +
+        '<img class="chat-avatar" src="{{ url_for("static", filename="imgs/glmpfp.png") }}" alt="GLM">' +
+        '<div class="chat-bubble-body">对话已清空～ 还想聊点什么？</div>' +
+      '</div>';
+  });
+})();
+</script>
+
+{% endblock %}

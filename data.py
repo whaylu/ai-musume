@@ -15,6 +15,7 @@ from core import (
     ExternalSite, AboutItem, SectionMeta,
     QuizOption, QuizQuestion,
     Prediction,
+    TutorialStep, Tutorial,
 )
 
 
@@ -537,7 +538,7 @@ ABOUT_ITEMS: list[AboutItem] = [
     AboutItem("技术栈", "Python (Flask + Jinja2) + 原生 HTML / CSS / JavaScript；字体 Noto Sans SC。"),
     AboutItem("站长", "Whaylu"),
     AboutItem("说明", "站内所有 AI 模型名称、Logo 与商标归各自公司所有；本站仅作学习与演示用途，不构成任何商业推荐。"),
-    AboutItem("版本", "v0.7"),
+    AboutItem("版本", "v0.8"),
 ]
 
 
@@ -971,11 +972,213 @@ PREDICTIONS: list[Prediction] = [
 
 
 # ============================================================
+# 新手教程
+# ============================================================
+TUTORIALS: list[Tutorial] = [
+    Tutorial(
+        id="first-chat",
+        title="第一次用 AI：从打开到问出好问题",
+        subtitle="注册、对话、追问，一次走完",
+        level="入门",
+        duration="5 分钟",
+        goal="知道用哪个入口、怎么问第一个问题、怎么让它改得更好",
+        tags=["入门", "对话"],
+        steps=[
+            TutorialStep(
+                order=1,
+                title="选一个网页版入口",
+                desc="不需要信用卡，不需要装软件。打开浏览器，任选一个：DeepSeek（chat.deepseek.com）、Kimi（kimi.moonshot.cn）、通义千问（tongyi.aliyun.com）。三个都免费，随便挑一个。",
+                action="https://chat.deepseek.com",
+                action_label="打开 DeepSeek",
+            ),
+            TutorialStep(
+                order=2,
+                title="不要问「你好」",
+                desc="第一句话别打招呼，直接给它一个具体任务。模糊的问题只能得到模糊的回答。",
+                action="帮我把下面这段话改得更简洁，保留原意，不超过 100 字：\n\n（把你的文字贴在这里）",
+                action_label="复制这条 prompt",
+            ),
+            TutorialStep(
+                order=3,
+                title="追问，而不是重新问",
+                desc="如果回答不满意，不要新开对话。在同一个对话里说「第二点再展开说说」或「语气再轻松一点」。AI 记得你前面说过什么。",
+                action="第二点再展开说说，举一个具体的例子",
+                action_label="复制这条追问",
+            ),
+            TutorialStep(
+                order=4,
+                title="让它自我检查",
+                desc="回答写完后，加一句「检查一遍有没有事实错误或逻辑跳跃」。它会重新审视自己的答案，经常能揪出问题。",
+                action="检查一遍你刚才的回答，有没有事实错误、逻辑跳跃、或者说得太绝对的地方？有的话指出来并修正。",
+                action_label="复制这条检查指令",
+            ),
+        ],
+    ),
+    Tutorial(
+        id="prompt-basics",
+        title="写好 Prompt：让 AI 听懂人话",
+        subtitle="角色、背景、格式、例子——四件套",
+        level="入门",
+        duration="8 分钟",
+        goal="学会用四个要素写出稳定可用的 prompt",
+        tags=["入门", "Prompt"],
+        steps=[
+            TutorialStep(
+                order=1,
+                title="给角色",
+                desc="告诉它「你是谁」。不是「你是一个 AI」，而是「你是一个有十年经验的小学语文老师」。角色决定了它的用词和判断标准。",
+                action="你是一位有十年经验的小学语文老师，擅长把复杂的概念讲给三年级学生听。",
+                action_label="复制角色设定",
+            ),
+            TutorialStep(
+                order=2,
+                title="给背景",
+                desc="告诉它「现在是什么情况」。读者是谁、目的是什么、有什么限制。背景越具体，回答越贴题。",
+                action="我要给班上的学生写一封家长会通知。家长大多工作忙，看通知只看前两行。字数不超过 200 字。",
+                action_label="复制背景描述",
+            ),
+            TutorialStep(
+                order=3,
+                title="给格式",
+                desc="告诉它「输出长什么样」。用列表还是表格？分几段？要不要标题？格式说清楚，省得你手动排版。",
+                action="请按这个格式输出：\n【标题】一句话\n【正文】分 3 段，每段不超过 50 字\n【注意事项】列 2 条",
+                action_label="复制格式要求",
+            ),
+            TutorialStep(
+                order=4,
+                title="给例子",
+                desc="如果风格很难用语言描述，直接给它 2-3 个例子。这叫 Few-shot，比任何形容词都有效。",
+                action="我想要这种风格：\n例 1：今天的作业不多，但要认真。\n例 2：明天带跳绳，别忘。\n例 3：周五下午开家长会，请准时。\n\n请用同样的风格，写一条「下周一带美术材料」的通知。",
+                action_label="复制 Few-shot 示例",
+            ),
+        ],
+    ),
+    Tutorial(
+        id="coding-with-ai",
+        title="用 AI 学编程：从读懂到写完",
+        subtitle="解释代码、写示例、调 bug、写测试",
+        level="进阶",
+        duration="10 分钟",
+        goal="把 AI 当成随叫随到的编程搭子，而不是代写工具",
+        tags=["进阶", "编程"],
+        steps=[
+            TutorialStep(
+                order=1,
+                title="让它逐段解释代码",
+                desc="拿到一段看不懂的代码，不要让它「总结」，让它「逐段讲」。每段说明：做了什么、为什么这么做、有什么坑。",
+                action="请逐段解释下面这段代码：\n1. 先给一段整体说明\n2. 按代码块逐段讲：做了什么、为什么这么做、有什么坑\n3. 最后总结设计思路\n\n```\n（粘贴代码）\n```",
+                action_label="复制解释 prompt",
+            ),
+            TutorialStep(
+                order=2,
+                title="要最小可运行示例",
+                desc="不要让它一上来写完整项目。先要一个 20 行以内、能直接跑的最小示例。跑通了，再逐步加功能。",
+                action="请给我一个最小可运行的 Python 示例，实现「读取 CSV 并统计每列缺失值数量」。不超过 20 行，包含必要的 import，写完后附一行运行说明。",
+                action_label="复制示例 prompt",
+            ),
+            TutorialStep(
+                order=3,
+                title="调 bug：先诊断，再治疗",
+                desc="贴代码和报错，但要求它先说出根因，再给修复。否则它会瞎改一通，改完还是错的。",
+                action="下面是我的代码和报错。请：\n1. 先用一句话说出你认为的根因\n2. 列出 2 个可能的其他原因\n3. 给出最小复现示例\n4. 再给修复后的代码\n\n【代码】\n（粘贴）\n\n【报错】\n（粘贴）",
+                action_label="复制调试 prompt",
+            ),
+            TutorialStep(
+                order=4,
+                title="让它写测试，而不是写更多功能",
+                desc="功能写完后，让它为这个函数写单元测试。覆盖正常、边界、异常三类。测试比功能更能暴露设计问题。",
+                action="请为下面这个函数写 Pytest 单元测试：\n1. 覆盖正常情况、边界情况（空值 / 极值）、异常情况\n2. 每个测试加一句中文说明它在测什么\n3. 尽量用参数化测试减少重复\n\n```\n（粘贴函数）\n```",
+                action_label="复制测试 prompt",
+            ),
+        ],
+    ),
+    Tutorial(
+        id="long-doc",
+        title="用 AI 读长文档：论文、合同、报告",
+        subtitle="先总结，再追问，最后做对比",
+        level="进阶",
+        duration="6 分钟",
+        goal="把几十页的文档压缩成能用的信息",
+        tags=["进阶", "长文本"],
+        steps=[
+            TutorialStep(
+                order=1,
+                title="选一个长上下文模型",
+                desc="不是所有 AI 都能读长文档。Kimi（200 万字）、Gemini（200 万 Token）、Claude（20 万 Token）是长文本第一梯队。DeepSeek 128K 适合中等长度。",
+                action="https://kimi.moonshot.cn",
+                action_label="打开 Kimi",
+            ),
+            TutorialStep(
+                order=2,
+                title="先让它做结构化总结",
+                desc="不要问「这篇讲了什么」。给它一个总结框架，输出才能直接用。",
+                action="请阅读下面这份文档，按这个结构输出：\n1. 一句话核心结论\n2. 3-5 个关键论点，每个配一句原文引用\n3. 作者没有明说但暗示了的 2 个前提\n4. 这份文档最薄弱的地方在哪里\n\n【文档】\n（粘贴或上传）",
+                action_label="复制总结 prompt",
+            ),
+            TutorialStep(
+                order=3,
+                title="追问具体段落",
+                desc="总结只是入口。真正有用的信息在细节里。针对某一段追问「这里的数据来源是什么」「这个结论的适用边界在哪」。",
+                action="第 3 节的结论，在什么条件下不成立？请举一个反例。",
+                action_label="复制追问示例",
+            ),
+            TutorialStep(
+                order=4,
+                title="两份文档做对比",
+                desc="同时喂两份文档，让它列出异同。比自己逐行比对快十倍。",
+                action="下面有两份文档 A 和 B。请用表格对比它们在「核心观点 / 论据 / 适用场景 / 局限性」四个维度的异同。\n\n【文档 A】\n（粘贴）\n\n【文档 B】\n（粘贴）",
+                action_label="复制对比 prompt",
+            ),
+        ],
+    ),
+    Tutorial(
+        id="writing-with-ai",
+        title="用 AI 写作：从大纲到成稿",
+        subtitle="先定骨架，再填血肉，最后人工润色",
+        level="入门",
+        duration="8 分钟",
+        goal="让 AI 帮你写完一篇文章，但读起来像你写的",
+        tags=["入门", "写作"],
+        steps=[
+            TutorialStep(
+                order=1,
+                title="先让它出 3 个大纲，你挑一个",
+                desc="不要一上来让它写全文。先让它给 3 个不同角度的大纲，你挑一个，再往下走。这样文章的骨架是你选的，不是它替你定的。",
+                action="我想写一篇关于「高中生如何用 AI 学习」的文章，读者是同龄人。请给我 3 个不同角度的大纲，每个 4-5 个要点，标注这个角度的优势和劣势。",
+                action_label="复制大纲 prompt",
+            ),
+            TutorialStep(
+                order=2,
+                title="逐段写，不要一次写全文",
+                desc="选好大纲后，一段一段让它写。每段写完你看一眼，不满意就让它改。一次写全文，改起来更痛苦。",
+                action="按上面选定的第 2 个大纲，先写第一部分（引言 + 第一个要点）。语气轻松，像在跟朋友聊天，不要用「首先」「其次」。",
+                action_label="复制分段 prompt",
+            ),
+            TutorialStep(
+                order=3,
+                title="让它批评自己的稿子",
+                desc="全文写完后，让它扮演一个挑剔的编辑，指出问题。这比让它「再改改」有效得多。",
+                action="现在你是一个严格的杂志编辑。请批评这篇稿子：\n1. 哪一段最弱，为什么\n2. 有没有「AI 味」的句子，指出来\n3. 如果只能改一处，你会改哪里\n\n【稿件】\n（粘贴）",
+                action_label="复制批评 prompt",
+            ),
+            TutorialStep(
+                order=4,
+                title="人工润色：加一句只有你能写的话",
+                desc="最后一步必须你自己做。在文章里加一句具体的、只有你经历过的话——一个场景、一个细节、一句对话。这是「活人感」的来源，AI 给不了。",
+                action="（这一步没有 prompt，关掉 AI，自己写。）",
+                action_label="",
+            ),
+        ],
+    ),
+]
+
+
+# ============================================================
 # 特别栏目
 # ============================================================
 SECTIONS: dict[str, SectionMeta] = {
     "octagon":     SectionMeta("octagon",     "虚拟八角笼", "OCTAGON BATTLE",     "imgs/battle.png"),
     "prediction":  SectionMeta("prediction",  "大模型预言", "AI PREDICTION",      "imgs/yuyan.png"),
     "quiz":        SectionMeta("quiz",        "仝娘大测试", "QUIZ CHALLENGE",     "imgs/group003.png"),
-    "catchphrase": SectionMeta("catchphrase", "口头禅收录", "CATCHPHRASE ARCHIVE", "imgs/group001.png"),
+    "catchphrase": SectionMeta("catchphrase", "口头禅收录", "CATCHPHRASE ARCHIVE", "imgs/glmbg.png"),
 }

@@ -32,6 +32,7 @@ __all__ = [
     "CharacterService", "NewsService", "TermService",
     "BattleService", "DiscoverService",
     "QuizOption", "QuizQuestion", "QuizService",
+    "TutorialStep", "Tutorial", "TutorialService",
     "Prediction", "PredictionService",
     "FilterTag", "DiscoverHit",
     "WeightedField", "SearchHit", "SearchQuery", "Page",
@@ -725,6 +726,58 @@ class QuizService:
             "results": results,
             "comment": comment,
         }
+
+# ============================================================
+# 新手教程
+# ============================================================
+@dataclass
+class TutorialStep:
+    """教程中的一步。action 可以是可复制的 prompt，也可以是网址。"""
+    order: int
+    title: str
+    desc: str
+    action: str = ""
+    action_label: str = ""
+
+
+@dataclass
+class Tutorial:
+    """一篇新手教程。"""
+    id: str
+    title: str
+    subtitle: str
+    level: str          # 入门 / 进阶
+    duration: str       # 如 "5 分钟"
+    goal: str           # 学完能做什么
+    steps: List[TutorialStep] = field(default_factory=list)
+    tags: List[str] = field(default_factory=list)
+
+    @property
+    def step_count(self) -> int:
+        return len(self.steps)
+
+
+class TutorialService:
+    """新手教程服务。"""
+
+    def __init__(self, tutorials: List[Tutorial]):
+        self._tutorials = tutorials
+        self._by_id = {t.id: t for t in tutorials}
+
+    def all(self) -> List[Tutorial]:
+        return self._tutorials
+
+    def get(self, tutorial_id: str) -> Optional[Tutorial]:
+        return self._by_id.get(tutorial_id)
+
+    def by_level(self, level: str) -> List[Tutorial]:
+        return [t for t in self._tutorials if t.level == level]
+
+    def featured(self, n: int = 4) -> List[Tutorial]:
+        return self._tutorials[:n]
+
+    def count(self) -> int:
+        return len(self._tutorials)
 
 # ============================================================
 # 大模型预言

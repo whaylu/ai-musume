@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('home') }}">← 返回首页</a>
+    <span class="detail-code">BEGINNER TUTORIALS</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">新手教程 <span class="en-title">BEGINNER TUTORIALS</span></h2>
+  </div>
+
+  <div class="tutorial-intro">
+    <p>看完图鉴知道「哪个 AI 适合我」，但不知道怎么开始用？</p>
+    <p>这里每篇教程都是<strong>一步步可操作</strong>的：打开哪个网站、问什么问题、怎么追问。每步都有可直接复制的 prompt。</p>
+    <p>学完不想切出去？直接去 <a href="{{ url_for('chat') }}">GLM 聊天室</a>，把教程里的 prompt 粘进去当场试。</p>
+  </div>
+
+  <div class="tutorial-result-count">共 <b>{{ total }}</b> 篇教程</div>
+
+  <div class="tutorial-grid tutorial-grid-full">
+    {% for t in tutorials %}
+      <a class="tutorial-card" href="{{ url_for('tutorial_detail', tutorial_id=t.id) }}">
+        <div class="tutorial-head">
+          <span class="tutorial-level {{ 'is-advanced' if t.level == '进阶' }}">{{ t.level }}</span>
+          <span class="tutorial-duration">{{ t.duration }}</span>
+        </div>
+        <h3 class="tutorial-title">{{ t.title }}</h3>
+        <p class="tutorial-sub">{{ t.subtitle }}</p>
+        <p class="tutorial-goal">🎯 {{ t.goal }}</p>
+        <div class="tutorial-foot">
+          <span class="tutorial-steps">{{ t.step_count }} 步</span>
+          <span class="tutorial-arrow">→</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

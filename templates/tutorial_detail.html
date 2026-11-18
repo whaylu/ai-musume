@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="detail-header">
+    <a class="back-btn" href="{{ url_for('tutorials') }}">← 返回教程列表</a>
+    <span class="detail-code">{{ tutorial.level }} · {{ tutorial.duration }}</span>
+  </div>
+
+  <div class="section-title-wrapper">
+    <div class="title-decor"></div>
+    <h2 class="titles">{{ tutorial.title }} <span class="en-title">{{ tutorial.step_count }} STEPS</span></h2>
+  </div>
+
+  <div class="tutorial-meta">
+    <p class="tutorial-goal-line">🎯 <strong>学完能做到：</strong>{{ tutorial.goal }}</p>
+    <div class="tutorial-tags">
+      {% for tag in tutorial.tags %}
+        <span class="tutorial-tag">#{{ tag }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="tutorial-step-list">
+    {% for step in tutorial.steps %}
+      <div class="tutorial-step">
+        <div class="tutorial-step-head">
+          <span class="tutorial-step-num">{{ "%02d"|format(step.order) }}</span>
+          <h3 class="tutorial-step-title">{{ step.title }}</h3>
+        </div>
+        <p class="tutorial-step-desc">{{ step.desc }}</p>
+
+        {% if step.action %}
+          <div class="tutorial-action">
+            {% if step.action_label %}
+              <div class="tutorial-action-bar">
+                <span class="tutorial-action-label">{{ step.action_label }}</span>
+                <button type="button" class="tutorial-copy-btn"
+                        data-copy="{{ step.action }}">复制</button>
+              </div>
+            {% endif %}
+            <pre class="tutorial-action-content">{{ step.action }}</pre>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="tutorial-finish">
+    <p>🎉 走完这 {{ tutorial.step_count }} 步，你就已经能用了。</p>
+    <p>接下来，去 <a href="{{ url_for('chat') }}">GLM 聊天室</a>直接跟 AI 聊两句，把刚学的 prompt 试着问一遍。</p>
+  </div>
+
+  {% if others %}
+    <div class="tutorial-others">
+      <div class="section-title-wrapper" style="margin-top:36px;">
+        <div class="title-decor"></div>
+        <h3 class="titles">接下来看 <span class="en-title">WHAT'S NEXT</span></h3>
+      </div>
+      <div class="tutorial-grid">
+        {% for t in others %}
+          <a class="tutorial-card" href="{{ url_for('tutorial_detail', tutorial_id=t.id) }}">
+            <div class="tutorial-head">
+              <span class="tutorial-level {{ 'is-advanced' if t.level == '进阶' }}">{{ t.level }}</span>
+              <span class="tutorial-duration">{{ t.duration }}</span>
+            </div>
+            <h3 class="tutorial-title">{{ t.title }}</h3>
+            <p class="tutorial-sub">{{ t.subtitle }}</p>
+            <div class="tutorial-foot">
+              <span class="tutorial-steps">{{ t.step_count }} 步</span>
+              <span class="tutorial-arrow">→</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+(function () {
+  document.querySelectorAll('.tutorial-copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.dataset.copy;
+      var done = function () {
+        btn.textContent = '已复制 ✓';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = '复制';
+          btn.classList.remove('copied');
+        }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallback(text, done); });
+      } else {
+        fallback(text, done);
+      }
+    });
+  });
+
+  function fallback(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+
+{% endblock %}
