@@ -163,10 +163,13 @@
         </div>
       </a>
     {% endfor %}
-  </div>
 
-  <div class="tutorial-more">
-    <a href="{{ url_for('tutorials') }}">查看全部教程 →</a>
+    <a class="card card-more" href="{{ url_for('tutorials') }}">
+      <div class="card-more-icon">📖</div>
+      <div class="card-title">查看全部教程</div>
+      <div class="card-tag">ALL TUTORIALS</div>
+      <div class="card-more-sub">完整教程列表 →</div>
+    </a>
   </div>
 </section>
 

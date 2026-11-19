@@ -312,6 +312,13 @@ CHARACTERS: list[AiCharacter] = [
 # ============================================================
 NEWS: list[NewsItem] = [
     NewsItem(
+        img="https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/3345/live/4030f5a0-deea-11f1-9dd5-b5dd10100b88.jpg.webp",
+        date="2026-11-12",
+        title="Nvidia董事会宣布黄仁勋辞任执行长",
+        desc="黄仁勋辞任英伟达CEO，公司首席财务官克雷斯临时接任",
+        url="https://www.bbc.com/zhongwen/articles/c63egjy85wq8o/simp",
+    ),
+    NewsItem(
         img="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/gemini_carbon_102726_social_share.width-1300.png",
         date="2026-10-30",
         title="谷歌 Gemini 4 Carbon 登顶第三方评测",
